@@ -11,14 +11,20 @@ function login(req, res, next) {
     if (err) {
       return next(err);
     }
-    // if (!user) {
-    //   return res.status(401).json({ message: 'Invalid credentials' });
-    // }
     const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
-    return res.json({ token });
+    res.cookie('token', token, {
+      httpOnly: true,
+    })
+    console.log(token);
+    return res.redirect('/messages')
   })(req, res, next);
 };
 module.exports = { login }
+
+
+
+
+
 
 
 

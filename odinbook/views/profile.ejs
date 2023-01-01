@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="board" id="dashboard">
+          <h1>Odin Book</h1>
+          <% for (let i = 0; i < links.length; i++) { %>
+            <a href="<%= links[i].href %>">
+              <%= links[i].text %>
+              <icon class="<%= links[i].icon %>" id="icon-style" </icon>
+            </a>
+          <% } %>
+        </div>
+        
+        
+        <div class="board" id="profile">
+            <h1 style="margin-right: 550px; ">Profile</h1>
+            <h1>PROFILE PAGE</h1>
+            <p>Profilename: <%= profile.profilename%></p>
+            <p>Name: <%= profile.name%></p>
+            <p>Bio: <%= profile.bio%></p>
+            <p>Photo: <%= profile.pictures%></p>
+            <p>location: <%= profile.location %></p>
+            <p>pronoun: <%= profile.pronoun %></p>
+        
+            <h2><%= profile.picturename %></h2>
+            <p>Picture Size: <%= profile.pictureSize %> bytes</p>
+            <p>Upload Time: <%= profile.createdAt %></p>
+            <img src="<%= `/images/${profile.picturename}` %>" alt="Uploaded Image" style="width: 300px;"/>
+        </div>
+              
+        
+        <div class="board" id="subscribe">
+          <h2>Subscribe to Premium</h2>
+          <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
+          <button style="background-color: lightskyblue; border-radius: 20px; padding: 10px; margin-top: 20px;">Subscribe</button>
+        </div>
+    
+        <div class="board" id="trending">
+          <h2>What's happening?</h2>
+          <p style="color: gray;">Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
+        </div>
+    </div>        
+</body>
+</html>
