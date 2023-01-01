@@ -13,7 +13,7 @@ exports.createPost = async (req, res) => {
     });
     // res.status(201).json(post);
     // res.redirect('/api/comment');
-    res.render("../odinbook/views/posts", {post})
+    res.render("../odinbook/views/posts", {post, links})
     
 //   } catch (err) {
 //     res.status(500).json({ message: 'Failed to create post' });
@@ -23,8 +23,10 @@ exports.createPost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await prisma.post.findMany();
+
+    
     // res.status(200).json(posts);
-    res.render("../odinbook/views/posts", {posts})
+    res.render("../odinbook/views/posts", { posts })
     // res.redirect('/api/comment');
   } catch (err) {
     res.status(500).json({ message: 'Failed to retrieve posts' });

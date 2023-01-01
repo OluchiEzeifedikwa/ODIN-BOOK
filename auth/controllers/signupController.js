@@ -15,9 +15,6 @@ async function signup(req, res) {
       data: {
         username: req.body.username,
         email: req.body.email,
-        bio: req.body.bio,
-        location: req.body.location,
-        pronoun: req.body.pronoun,
         password: hashedPassword,
       },
     });

@@ -1,0 +1,33 @@
+2025-02-23 15:31:21.479 WAT [93134] LOG:  starting PostgreSQL 14.17 (Homebrew) on x86_64-apple-darwin20.6.0, compiled by Apple clang version 13.0.0 (clang-1300.0.29.30), 64-bit
+2025-02-23 15:31:21.482 WAT [93134] LOG:  listening on IPv6 address "::1", port 5432
+2025-02-23 15:31:21.482 WAT [93134] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-02-23 15:31:21.483 WAT [93134] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2025-02-23 15:31:21.489 WAT [93135] LOG:  database system was shut down at 2025-02-23 15:30:59 WAT
+2025-02-23 15:31:21.495 WAT [93134] LOG:  database system is ready to accept connections
+2025-02-23 15:32:11.856 WAT [93179] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:36:05.675 WAT [93246] ERROR:  role "OluchiEze" already exists
+2025-02-23 15:36:05.675 WAT [93246] STATEMENT:  CREATE ROLE "OluchiEze" NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;
+2025-02-23 15:38:40.353 WAT [93340] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:40:45.251 WAT [93430] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:43:36.219 WAT [93482] ERROR:  role "oluchieze" does not exist
+2025-02-23 15:43:36.219 WAT [93482] STATEMENT:  GRANT ALL PRIVILEGES ON DATABASE mydatabase TO OluchiEze;
+2025-02-23 15:44:44.025 WAT [93535] FATAL:  role "l" does not exist
+2025-02-23 15:46:01.668 WAT [93584] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:46:43.837 WAT [93638] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:49:17.870 WAT [93753] ERROR:  database "oluchieze" does not exist
+2025-02-23 15:49:17.870 WAT [93753] STATEMENT:  GRANT ALL PRIVILEGES ON DATABASE OluchiEze TO mydatabase;
+2025-02-23 15:51:01.214 WAT [94552] ERROR:  database "myuser" does not exist
+2025-02-23 15:51:01.214 WAT [94552] STATEMENT:  GRANT ALL PRIVILEGES ON DATABASE myuser TO mydatabase;
+2025-02-23 15:51:20.209 WAT [94572] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:54:04.071 WAT [94642] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:55:33.130 WAT [94714] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:57:49.520 WAT [94810] FATAL:  database "OluchiEze" does not exist
+2025-02-23 15:58:36.644 WAT [95089] FATAL:  database "OluchiEze" does not exist
+2025-02-24 00:54:17.318 WAT [72798] FATAL:  database "OluchiEze" does not exist
+2025-02-24 01:10:18.494 WAT [75962] FATAL:  database "OluchiEze" does not exist
+2025-02-24 01:12:43.953 WAT [76045] FATAL:  role "postgres" does not exist
+2025-02-24 01:17:17.171 WAT [76487] FATAL:  database "OluchiEze" does not exist
+2025-02-25 23:10:53.495 WAT [93134] LOG:  received smart shutdown request
+2025-02-25 23:10:53.500 WAT [93134] LOG:  background worker "logical replication launcher" (PID 93141) exited with exit code 1
+2025-02-25 23:10:53.500 WAT [93136] LOG:  shutting down
+2025-02-25 23:10:53.509 WAT [93134] LOG:  database system is shut down
