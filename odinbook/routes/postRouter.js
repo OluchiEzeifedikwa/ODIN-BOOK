@@ -4,14 +4,12 @@ const postController = require('../controllers/postController');
 
 
 
-postRouter.get('/api/post', (req, res) => {
-    res.render('../odinbook/views/createpost');
+postRouter.get('/post', (req, res) => {
+    res.render('../odinbook/views/createPost');
 });
 
-postRouter.post('/api/post', postController.createPost);
+postRouter.post('/post', postController.createPost);
 postRouter.get('/api/posts', postController.getAllPosts);
 postRouter.get('/api/post/:id', postController.getPostById);
-
-
 
 module.exports = postRouter;

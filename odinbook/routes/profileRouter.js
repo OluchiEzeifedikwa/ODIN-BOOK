@@ -28,12 +28,12 @@ profileRouter.get('/profile', (req, res) => {
     res.render('../odinbook/views/createProfile');
 });
 profileRouter.post('/profile', upload.single("image"), profileController.createProfile);
+profileRouter.get('/profile', profileController.getProfileById);
 profileRouter.get('/profiles', profileController.getProfiles);
 profileRouter.get('/pictures', profileController.getPictures);
 profileRouter.get('/profiles/:id', profileController.getProfileById);
 profileRouter.put('/profiles/:id', profileController.updateProfile);
 profileRouter.delete('/profiles/:id', profileController.deleteProfile);
 profileRouter.get('/profiles/:id', profileController.editProfile);
-
 
 module.exports = profileRouter;

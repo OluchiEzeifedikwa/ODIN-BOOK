@@ -4,16 +4,16 @@ const prisma = new PrismaClient();
 
 exports.createPost = async (req, res) => {
 //   try {
-    const { username, content } = req.body;
+    const { id, content } = req.body;
     const post = await prisma.post.create({
-      data: { 
-        username, 
+      data: {
         content, 
+        user: {connect: {id}, },
     },
     });
     // res.status(201).json(post);
-    // res.redirect('/api/comment');
-    res.render("../odinbook/views/posts", {post, links})
+    // res.redirect('/comment');
+    res.render("../odinbook/views/posts", {post});
     
 //   } catch (err) {
 //     res.status(500).json({ message: 'Failed to create post' });

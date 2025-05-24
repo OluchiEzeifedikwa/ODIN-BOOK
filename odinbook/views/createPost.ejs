@@ -18,13 +18,14 @@
   <div class="container">
     <div class="board" id="createpost">
         <!-- <p style="margin-top: 10px;">What is happening?</p>  -->
-        <form action="/api/post" method="post">
-          <label for="username">Username</label>
-          <input type="username" name="username">
-          <br>
+        <form action="/post" method="post">
+          <label for="id">Id</label>
+          <input type="text" name="id">
+          <br><br>
           <label for="content">Content</label>
           <input type="text" id="content" name="content">
-          <button type="submit"  style="margin-left: 650px; margin-top: 40px;">Post</button>
+          <br><br>
+          <button type="submit">Post</button>
         </form>
         <!-- <button type="submit"  style="margin-left: 650px; margin-top: 40px;">Post</button> -->
     </div>

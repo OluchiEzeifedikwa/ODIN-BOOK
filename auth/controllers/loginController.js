@@ -16,7 +16,7 @@ function login(req, res, next) {
       httpOnly: true,
     })
     console.log(token);
-    return res.redirect('/messages')
+    return res.redirect('/home')
   })(req, res, next);
 };
 module.exports = { login }

@@ -4,61 +4,33 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 
-// To create a profile
-// exports.createProfile = async (req, res) => {
-//    try {
-    
-//     const { name, username } = req.body;
-//     const newProfile = await prisma.profile.create({
-//       data: {
-//         name,
-//         username,   
-//        },
-//     });
-
-//     res.redirect('/createProfile');
-//    } catch (err) {
-//      res.status(500).json({ message: 'Failed to create profile' });
-//   }
-// };
-
-
 exports.createProfile = async(req, res) => {
   try {
-    const { profilename, name, bio, location, pronoun } = req.body;
+    const { id, bio, location, pronoun } = req.body;
+    console.log(req.user)
+    console.log(req.bio)
     // const files = req.files;
     const picture = req.file; // Access the uploaded file
 
     const profile = await prisma.profile.create({
       data: {
-        profilename,
-        name,
         bio,
         location,
         pronoun,
+        user: {connect: {id}, },
       },
     });
 
     // await Promise.all(files.map(async (file) => {
-    await prisma.picture.create({
-      data: {
-        picturename: picture.originalname,
-        profileId: profile.id,
-      },
-    });
+    // await prisma.picture.create({
+    //   data: {
+    //     picturename: picture.originalname,
+    //     profileId: profile.id,
+    //   },
+    // });
 
-    const links = [
-      { href: "/home", text: "Home", icon: "fa fa-home" },
-      { href: "/explore", text: "Explore", icon: "fa fa-search"},
-      { href: "/messages", text: "Messages",  icon: "fa fa-envelope-o"},
-      { href: "/notifications", text: "Notifications",  icon: "fa fa-bell-o"},
-      { href: "/communities", text: "Communities", icon: "fa fa-group"},
-      { href: "/profile", text: "Profile", icon: "fa fa-user"},
-      { href: "/post", text: "Post"},
-      
-    ];
     
-    res.render("../odinbook/views/profile", {profile, links});
+    res.render("../odinbook/views/profile", {profile});
 
     // res.send({ message: 'Folder created and files uploaded successfully!' });
   } catch (error) {

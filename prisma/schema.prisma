@@ -13,104 +13,57 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
-  id                 String   @id @default(cuid())
-  password           String
-  username           String   @default("anonymous") @unique
-  createdAt          DateTime @default(now())
-  sentMessages       Message[] @relation("MessageSender")
-  receivedMessages   Message[] @relation("MessageRecipient")
-  email              String    @default("anonymous") @unique
-  followers          FollowRequest[]   @relation("followers")
-  following          FollowRequest[]   @relation("following")
-  posts              Post[]          
-  comments           Comment[]
-  likes              Like[]
-  profile            Profile[]
+  id       String   @id @default(cuid())
+  password String
+  email    String
+  username String   @default("anonymous") @unique
+  createdAt DateTime @default(now())
+  profile   Profile[]
+  posts     Post[]
+  comments  Comment[]
+  
 }
 
-model FollowRequest {
-  id                 String   @id @default(cuid())
-  sender             User     @relation("followers", fields: [senderUsername], references: [username])
-  senderUsername     String
-  receiver           User     @relation("following", fields: [receiverUsername], references: [username])
-  receiverUsername   String
-  status             String   @default("pending")
-  createdAt          DateTime @default(now())
+model Profile {
+  id         String   @id @default(cuid())
+  bio        String   @default("anonymous")
+  location  String?
+  pronoun   String?
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
 }
 
 model Post {
-  id              String   @id @default(cuid())
-  content         String
-  media           Media?
-  user            User     @relation(fields: [username], references: [username])
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  comments        Comment[]
-  likes           Like[]
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  comments  Comment[]
 }
 
 model Comment {
-  id             String   @id @default(cuid())
-  content        String
-  media          Media?
-  user           User     @relation(fields: [username], references: [username])
-  username       String     @unique
-  post           Post     @relation(fields: [postUsername], references: [username])
-  postUsername   String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
-model Like {
-  id             String   @id @default(cuid())
-  user           User     @relation(fields: [username], references: [username])
-  username       String    @unique
-  post           Post     @relation(fields: [postUsername], references: [username])
-  postUsername   String
-  createdAt      DateTime @default(now())
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 
-model Message {
-  id                 String   @id @default(cuid())
-  sender             User     @relation("MessageSender", fields: [senderUsername], references: [username])
-  senderUsername     String
-  recipient          User     @relation("MessageRecipient", fields: [recipientUsername], references: [username])
-  recipientUsername  String  
-  messages           String 
-  createdAt          DateTime @default(now())
-}
 
 
-model Profile {
-  id           String   @id @default(cuid())
-  profilename  String  @unique
-  bio          String  @default("anonymous")
-  name         String  @default("anonymous")
-  username     String  @unique
-  location     String?
-  pronoun      String?
-  user         User     @relation(fields: [username], references: [username])
-  pictures     Picture[]
-  createdAt         DateTime @default(now())
 
-}
 
-model Picture {
-  id                String   @id @default(cuid())
-  picturename       String
-  fileSize          Int       @default(0)
-  profile           Profile  @relation(fields: [profileId], references: [id])
-  profileId         String   @default("some-default-profile-id")
-  createdAt         DateTime @default(now())
-}
 
-model Media {
 
-}
 
-model Notification {
 
-}
 

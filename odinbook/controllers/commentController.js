@@ -5,22 +5,21 @@ const prisma = new PrismaClient();
 // To create a comment
 exports.createComment = async (req, res) => {
 //   try {
-    
-    const { username, comment } = req.body;
+    const { id, content } = req.body;
     const newComment = await prisma.comment.create({
       data: {
-        username, 
-        comment,
-        
-       },
-    });
-    // res.status(201).json(newComment);
-    // res.redirect(`/api/post/${postId}`);
-    res.redirect('/api/comment');
+        id,
+        content,
+      },  
+      })
+    res.render("../odinbook/views/posts", {newComment});
+}
+    
+    // res.redirect('/api/comment');
 //   } catch (err) {
 //     res.status(500).json({ message: 'Failed to create comment' });
 //   }
-};
+
 
 // To get all comments
 exports.getAllComments = async (req, res) => {
@@ -69,20 +68,6 @@ exports.deleteComment = async (req, res) => {
 };
 
 // To edit a comment
-exports.editComment = async (req, res) => {
-  try {
-     
-     const commentId = req.params.id
-     const comment = await prisma.comment.findUnique({
-       where: { 
-         id : commentId },
-     });
-     res.render('editComment', { comment });
-   } catch (err) {
-     res.status(500).json({ message: 'Failed to delete comments' });
-    }
- };
-
  exports.updateComment = async (req, res) => {
   try {
      

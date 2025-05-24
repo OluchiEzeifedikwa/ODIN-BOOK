@@ -10,21 +10,40 @@
 </head>
 <body>
     <div class="container">
-        <div class="board" id="dashboard">
-          <h1>Odin Book</h1>
-          <% for (let i = 0; i < links.length; i++) { %>
-            <a href="<%= links[i].href %>">
-              <%= links[i].text %>
-              <icon> class="<%= links[i].icon %>" id="icon-style" </icon>
-            </a>
-          <% } %>
+        <div class="board" id="dashboard"></div>
+          <div class="board" id="profile">
+            <h1>POSTS</h1>
+            <p>Content: <%= post.content %></p>
+
+
+          
+            <form action="/comment" method="post">
+              <input type="hidden" name="postId" value="<%= post.id %>">
+              <label for="id">Id</label>
+              <input type="text" name="id">
+              <br><br>
+              <label for="content">CONTENT</label>
+              <input type="text" name="content" placeholder="Write a comment..." style="width: 600px; border-radius:20px; background-color: lightgray;">
+              <br>
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+                
+                  
+                      
+  
+
+        <div class="board" id="subscribe">
+          <h2>Subscribe to Premium</h2>
+          <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
+          <button style="background-color: lightskyblue; border-radius: 20px; padding: 10px; margin-top: 20px;">Subscribe</button>
         </div>
-        
     
-    
-        <p><%= post.content %></p>
-        <p><%= post.username %></p>
-   
-    
+        <div class="board" id="trending">
+          <h2>What's happening?</h2>
+          <p style="color: gray;">Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
+        </div>
+
+    </div>    
 </body>
 </html>

@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 // const upload = multer({ dest: './uploads/' });
 const authLogin = require('./auth/routes/loginRouter');
 const authSignup = require('./auth/routes/signupRouter');
-const commentRouter = require('./odinbook/routes/commentRouter');
+// const commentRouter = require('./odinbook/routes/commentRouter');
 const postRouter = require('./odinbook/routes/postRouter');
 const profileRouter = require('./odinbook/routes/profileRouter');
 const messageRouter = require('./odinbook/routes/messageRouter');
@@ -45,12 +45,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(authLogin);
 app.use(authSignup);
-app.use(commentRouter);
+// app.use(commentRouter);
 app.use(postRouter);
 app.use(profileRouter);
 app.use(messageRouter);
 app.use(cookieParser());
 app.use("/images", express.static("images"));
+
 // app.use(methodOverride('_method'))
 // app.use(passportjs);
 // app.use(fileRouter);
@@ -73,61 +74,6 @@ app.get('/signin', (req, res) => {
 //   }
 // });
 
-
-
-
-
-
-
-
-// Middleware to verify token on incoming requests
-// app.use((req, res, next) => {
-//   const token = req.header('Authorization');
-
-//   if (!token) {
-//     return res.status(401).send('Access denied. No token provided.');
-//   }
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-//     req.user = decoded;
-//     next();
-//   } catch (ex) {
-//     res.status(400).send('Invalid token.');
-//   }
-// });
-
-// // Protected route
-// app.get('/protected', (req, res) => {
-//   res.send(`Hello, ${req.user.userId}!`);
-// });
-
-// app.get('/login', (req, res) => {
-//   res.render('../auth/views/login');
-// })
-
-// app.get('/signup', (req, res) => {
-//   res.render('signup');
-// })
-
-
-
-// app.post('/signup', async(req, res) => {
-//   const {username, password} = req.body;
-//   const hashedPassword = await bcrypt.hash(password, 10) 
-//   try {
-//     const user = await prisma.user.create({ data: {username, password: hashedPassword }});
-//     res.send(`User Created successfully: ${user.username}`);
-//   } catch (error) {
-//     res.status(500).send({message: 'Error Creating User'});
-//   }
-// });
-  
-// app.post('/login', passport.authenticate('local', {
-//   successRedirect: '/upload',
-//   failureRedirect: '/login',
-  
-// }));
 
 const links = [
   { href: "/home", text: "Home", icon: "fa fa-home" },
@@ -170,10 +116,11 @@ app.get("/profile", (req, res) => {
   res.render("../odinbook/views/profile", { links: links});
 });
 
-app.get("/post", (req, res) => {
-  res.render("../odinbook/views/posts", { links: links});
-});
+// app.get("/post", (req, res) => {
+//   res.render("../odinbook/views/posts", { links: links});
+// });
 
+app.use(cookieJwtAuth);
 
 
 
