@@ -18,7 +18,7 @@ const authSignup = require('./auth/routes/signupRouter');
 const postRouter = require('./odinbook/routes/postRouter');
 const profileRouter = require('./odinbook/routes/profileRouter');
 const messageRouter = require('./odinbook/routes/messageRouter');
-const { cookieJwtAuth } = require('./cookieJWTAuth');
+const { cookieJwtAuth } = require('./cookieJwtAuth');
 const cookieParser = require('cookie-parser')
 
 // const fileRouter = require('./routes/fileRouter');
