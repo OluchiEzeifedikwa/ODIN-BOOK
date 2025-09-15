@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="createpost-body">
   <!-- <form action="/api/post" method="post">
     <label for="content">CONTENT</label>
     <input type="text" name="content" id="content">
@@ -15,18 +16,17 @@
     <button type="submit">CREATE POST</button>
   </form> -->
 
-  <div class="container">
-    <div class="board" id="createpost">
+  <!-- <div class="container"> -->
+    <!-- <div class="board" id="createpost" style="background-color: black;"> -->
         <!-- <p style="margin-top: 10px;">What is happening?</p>  -->
+
+        <h1 class='header'>CREATE POSTS</h1>
         <form action="/post" method="post">
-          <label for="id">Id</label>
-          <input type="text" name="id">
-          <br><br>
           <label for="content">Content</label>
           <input type="text" id="content" name="content">
-          <br><br>
           <button type="submit">Post</button>
         </form>
+        
         <!-- <button type="submit"  style="margin-left: 650px; margin-top: 40px;">Post</button> -->
     </div>
   </div>

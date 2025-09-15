@@ -3,10 +3,6 @@ const commentRouter = Router();
 const commentController = require('../controllers/commentController');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-// const methodOverride = require('method-override');
-
-// commentRouter.use(methodOverride('_method'))
-
 
 commentRouter.get('/comment', (req, res) => { 
   res.render('../odinbook/views/createComment');
@@ -14,13 +10,11 @@ commentRouter.get('/comment', (req, res) => {
 
 
 // commentRouter.post('/createComment', commentController.createComment);
-commentRouter.get('/api/comments', commentController.getAllComments);
-commentRouter.delete('/createComment/:id/delete', commentController.deleteComment);
-commentRouter.put('/createComment/:id/edit', commentController.updateComment);
-commentRouter.post('/post', commentController.createComment);
-commentRouter.get('/api/comments/:id', commentController.getCommentById)
-commentRouter.post('/api/comments/:id', commentController.deleteComment);
-
+commentRouter.get('/posts/:id/comments', commentController.getAllComments);
+commentRouter.post('/posts/:id/comments', commentController.createComment);
+commentRouter.get('/posts/:postId/comments/:commentId', commentController.getCommentById);
+commentRouter.put('/posts/:postId/comments/:commentId', commentController.updateComment);
+commentRouter.delete('/posts/:postId/comments/:commentId', commentController.deleteComment);
 
 module.exports = commentRouter;
 

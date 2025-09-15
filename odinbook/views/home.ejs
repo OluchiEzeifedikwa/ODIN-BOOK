@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,63 +7,63 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    
-
     <div class="container">
-        <div class="board" id="dashboard">
+        <nav class="board" id="dashboard">
           <h1>Odin Book</h1>
           <% for (let i = 0; i < links.length; i++) { %>
             <a href="<%= links[i].href %>">
               <%= links[i].text %>
-              <icon class="<%= links[i].icon %>" id="icon-style" </icon>
+              <i class="<%= links[i].icon %>"></i>
             </a>
             <% } %>
-        </div>
+        </nav>
         
-        <div class="board" id="following">
-              <!-- <form action="example.com/path" method="post">
-              <i class="fa fa-search" id="fasearch"></i>
-              <input type="text" size="70">
-              </form> -->
-            <a href="">For You</a>
-            <h4 style="margin-left: 550px; margin-top: -20px;">
+        <section class="board" id="following">
             <a href="">Following</a>
-            </h4> 
-        </div>
+            <!-- <a href="" class="following-link">Following</a> -->
+        </section>
               
-        <div class="board" id="createpost">
-          <!-- <p style="margin-top: 10px;">What is happening?</p> -->
+        <section class="board" id="createpost">
           <form action="/api/post" method="post">
-            <label for="">What is happening?</label>
+            <label for="">What is the Update?</label>
             <input type="text">
+            <button>Post</button>
           </form>
-          <button style="margin-left: 650px; margin-top: 40px; ">Post</button>
-        </div>
+        </section>
     
-        <div class="board" id="showpost" style="color: lightskyblue; text-align: center;"><a href="">Show All posts</a></div>
+        <section class="board" id="showpost">
+          <a href="">Show All posts</a>
+        </section>
           
-        <div class="board" id="pictures">pictures</div>
+        <section class="board" id="pictures">pictures
+          <img src="./images/walls.png" alt="shopping boxes" style="width: 500px;">
+            <a href=""><i class="fa fa-heart"></i></a>
+            <a href=""><i class="fa fa-comment"></i></a>
+            <a href=""><i class="fa fa-bookmark"></i></a>
+            <a href=""><i class="fa fa-send"></i></a>
+        </section>
     
-        <div class="board" id="subscribe">
+        <section class="board" id="subscribe">
           <h2>Shop at affordable prices!</h2>
           <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
-          <button style="background-color: lightskyblue; border-radius: 20px; padding: 10px; margin-top: 20px;">Subscribe</button>
-        </div>
+          <button>Subscribe</button>
+        </section>
     
-        <div class="board" id="trending">
+        <section class="board" id="trending">
           <h2>What's trending?</h2>
-          <p style="color: gray;">Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
-        </div>
+          <p>Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
+        </section>
     
         <div class="search-container">
-          <input type="search" class="board" id="search-input">
+          <input type="search" id="search-input" value="Search....">
           <button type="submit" id="search-button">
-            <i class="fa fa-search" id="search"></i>
+            <!-- <i class="fa fa-search"></i> -->
           </button> 
         </div>
+
+        
 
     </div>        
 </body>

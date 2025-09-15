@@ -11,7 +11,8 @@ function login(req, res, next) {
     if (err) {
       return next(err);
     }
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    // const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
     res.cookie('token', token, {
       httpOnly: true,
     })

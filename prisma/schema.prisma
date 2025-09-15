@@ -13,17 +13,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id       String   @id @default(cuid())
   password String
-  email    String
+  email    String   @unique
   username String   @default("anonymous") @unique
   createdAt DateTime @default(now())
   profile   Profile[]
   posts     Post[]
   comments  Comment[]
-  
 }
 
 model Profile {
@@ -31,7 +29,7 @@ model Profile {
   bio        String   @default("anonymous")
   location  String?
   pronoun   String?
-  userId     String
+  userId     String   @unique
   user       User     @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now())
 }

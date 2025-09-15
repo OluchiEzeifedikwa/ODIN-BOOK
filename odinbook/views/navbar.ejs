@@ -15,9 +15,10 @@
       <% for (let i = 0; i < links.length; i++) { %>
         <a href="<%= links[i].href %>">
           <%= links[i].text %>
-          <icon class="<%= links[i].icon %>" id="icon-style" </icon>
+          <i class="<%= links[i].icon %>" id="icon-style"></i>
         </a>
-        <% } %>
+      <% } %>
+
     </div>
     
     <div class="board" id="following">
@@ -33,9 +34,11 @@
           
     <div class="board" id="createpost">
       <!-- <p style="margin-top: 10px;">What is happening?</p> -->
+      
       <form action="/api/post" method="post">
         <label for="">What is happening?</label>
-        <input type="text">
+        <input type="text" name="content">
+        <button type="submit" style="margin-left: 650px; margin-top: 40px; ">Post</button>
       </form>
       <button style="margin-left: 650px; margin-top: 40px; ">Post</button>
     </div>
@@ -54,6 +57,8 @@
       <h2>What's happening?</h2>
       <p style="color: gray;">Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
     </div>
+
+    
 
     <div class="search-container">
       <input type="search" id="search-input" class="board"  placeholder="Search...">

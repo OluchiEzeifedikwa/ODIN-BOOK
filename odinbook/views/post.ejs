@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="post-body">
@@ -13,15 +13,15 @@
         <div class="board" id="dashboard"></div>
         
           <div class="board" id="profile">
-            <h1 class="post-header">POSTS</h1>
+            <h1 class="post-header">YOUR POST</h1>
             <br>
-            <p><%= posts.content %></p>
+            <p><%= post.content %></p>
             <a href=""><i class="fa fa-heart-o"></i></a>
             <a href=""><i class="fa fa-comment-o"></i></a>
             <a href=""><i class="fa fa-bookmark-o"></i></a>
             <a href=""><i class="fa fa-send-o"></i></a>
             <form action="/comment" method="post">
-              <input type="hidden" name="postId" value="<%= posts.id %>">
+              <input type="hidden" name="postId" value="<%= post.id %>">
               <!-- <label for="id">Id</label>
               <input type="text" name="id"> -->
               <br>
