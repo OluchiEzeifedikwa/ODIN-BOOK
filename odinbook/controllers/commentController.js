@@ -93,7 +93,7 @@ exports.createComment = async (req, res) => {
     const newComment = await prisma.comment.create({
       data: {
         content,
-        post: { connect: { id: postId } },
+        post: { connect: { id: postId }},
       },
     });
     res.render("../odinbook/views/comments", { newComment });

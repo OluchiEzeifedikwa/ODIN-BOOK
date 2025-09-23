@@ -29,6 +29,19 @@ exports.createPost = async (req, res) => {
   }
 };
 
+exports.deletePost = async ( req, res) => {
+  const { content } = req.body;
+  const { id }  = req.params; 
+
+  const post = await prisma.post.delete({
+    where: {id},
+    
+  })
+  res.render({ post })
+
+}
+
+
 // Get all posts
 exports.getAllPosts = async (req, res) => {
   try {
@@ -58,6 +71,10 @@ exports.getPostById = async (req, res) => {
   }
 };
 
+
+
+
+
 // Update a post
 exports.updatePost = async (req, res) => {
   try {
@@ -73,6 +90,7 @@ exports.updatePost = async (req, res) => {
     res.status(500).render("../odinbook/views/error", { error: 'Failed to update post' });
   }
 };
+
 
 // Delete a post
 exports.deletePost = async (req, res) => {

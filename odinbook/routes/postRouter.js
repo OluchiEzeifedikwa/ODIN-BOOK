@@ -12,4 +12,6 @@ postRouter.get('/posts/:id', postController.getPostById);
 postRouter.put('/posts/:id', postController.updatePost);
 postRouter.delete('/posts/:id', postController.deletePost);
 
+postRouter.delete('/posts/:id', postController.deletePost)
+
 module.exports = postRouter;

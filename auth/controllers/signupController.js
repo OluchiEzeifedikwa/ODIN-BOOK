@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function signup(req, res) {
+async function signup(req, res) {          
   try {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
@@ -16,6 +16,7 @@ async function signup(req, res) {
         username: req.body.username,
         email: req.body.email,
         password: hashedPassword,
+        signedUp: true,
       },
     });
     // return res.json(user);
@@ -24,5 +25,13 @@ async function signup(req, res) {
     return res.status(500).json({ message: 'Error creating user' });
   }
 };
+
+
+   
+
+
+
+
+
 module.exports = { signup }
 

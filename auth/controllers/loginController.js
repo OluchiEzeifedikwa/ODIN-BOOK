@@ -7,11 +7,10 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 function login(req, res, next) {
-  passport.authenticate('local', { session: false }, (err, user, info) => {
-    if (err) {
-      return next(err);
+  passport.authenticate('local', (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).json({ message: 'Invalid username or password' });
     }
-    // const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
     const token = jwt.sign({ id: user.id }, process.env.SECRET_KEY, { expiresIn: '1h' });
     res.cookie('token', token, {
       httpOnly: true,
@@ -20,6 +19,7 @@ function login(req, res, next) {
     return res.redirect('/home')
   })(req, res, next);
 };
+
 module.exports = { login }
 
 
