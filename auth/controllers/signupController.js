@@ -8,7 +8,7 @@ async function signup(req, res) {
   try {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).send('Missing required fields' );
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = await prisma.user.create({
@@ -16,22 +16,27 @@ async function signup(req, res) {
         username: req.body.username,
         email: req.body.email,
         password: hashedPassword,
-        signedUp: true,
       },
-    });
+    }); 
     // return res.json(user);
-    return res.redirect('/login');
+    console.log(user);
+    return res.send('succesful');
   } catch (error) {
-    return res.status(500).json({ message: 'Error creating user' });
+    return res.status(500).send( 'Error creating user' );
   }
 };
 
+async function getUser(req, res) {
+  const users = await prisma.user.findUnique({
+    where: {username: 'gica'},
+  });
+  if(users) {
+    console.log('user gica exists')
+  }
+  else(
+    console.log('user not found')
+  )
+}
 
-   
-
-
-
-
-
-module.exports = { signup }
+module.exports = { signup, getUser}
 

@@ -7,5 +7,6 @@ signupRouter.get('/signup', (req, res) => {
   })
 
 signupRouter.post('/signup', signupController.signup)
+signupRouter.get('/gica', signupController.getUser)
 
 module.exports = signupRouter;

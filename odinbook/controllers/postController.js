@@ -29,17 +29,6 @@ exports.createPost = async (req, res) => {
   }
 };
 
-exports.deletePost = async ( req, res) => {
-  const { content } = req.body;
-  const { id }  = req.params; 
-
-  const post = await prisma.post.delete({
-    where: {id},
-    
-  })
-  res.render({ post })
-
-}
 
 
 // Get all posts

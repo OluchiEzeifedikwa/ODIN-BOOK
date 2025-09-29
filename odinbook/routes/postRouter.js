@@ -5,7 +5,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 
-postRouter.get('/post', postController.getCreatePost);
+postRouter.get('/createPost', postController.getCreatePost);
 postRouter.get('/posts', postController.getAllPosts);
 postRouter.post('/posts', postController.createPost);
 postRouter.get('/posts/:id', postController.getPostById);
