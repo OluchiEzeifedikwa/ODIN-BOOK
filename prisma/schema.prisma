@@ -19,7 +19,7 @@ model User {
   email     String   @unique
   username  String   @default("anonymous") @unique
   createdAt DateTime @default(now())
-  profile   Profile[]
+  profile   Profile?
   posts     Post[]
   comments  Comment[]
 }

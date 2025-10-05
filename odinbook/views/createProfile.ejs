@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Create Profile</title>
 </head>
 <body>
     <h1>Create Profile</h1>
     <form action="/createProfile" method="post" enctype="multipart/form-data">
-        <input type="file" name="image">
+        <label for="image">Profile Picture:</label>
+        <input type="file" name="image" id="image">
         <br><br>
-        <label for="bio">Bio</label>
-        <textarea name="bio" id="bio"></textarea>
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email">
         <br><br>
-        <label for="location">Location</label>
-        <input type="location" name="location">
+        <label for="bio">Bio:</label>
+        <textarea name="bio" id="bio" placeholder="Tell us about yourself..."></textarea>
         <br><br>
-        <label for="pronoun">Pronoun</label>
-        <input type="pronoun" name="pronoun">
+        <label for="location">Location:</label>
+        <input type="text" name="location" id="location" placeholder="City, Country">
         <br><br>
-        <button type="submit">Update Profile</button>
+        <label for="pronoun">Pronoun:</label>
+        <input type="text" name="pronoun" id="pronoun" placeholder="e.g. He/Him, She/Her, They/Them">
+        <br><br>
+        <button type="submit">Create Profile</button>
     </form>
 </body>
 </html>

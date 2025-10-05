@@ -35,9 +35,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/uploads", express.static("uploads"));
-app.use(profileRouter);
 app.use(authLogin);
 app.use(authSignup);
+app.use(profileRouter);
 app.use(commentRouter);
 app.use(postRouter);
 app.use(homeRouter);

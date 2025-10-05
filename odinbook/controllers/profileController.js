@@ -1,13 +1,17 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-
 exports.createProfile = async (req, res) => {
-  console.log(req.user)
   try {
-    const { bio, location, pronoun } = req.body;
+    const { email, password, bio, location, pronoun } = req.body;
 
     // Validate input
+    if (!email || email.trim() === '') {
+      return res.status(400).send({ error: 'Email is required' });
+    }
+    if (!password || password.trim() === '') {
+      return res.status(400).send({ error: 'Password is required' });
+    }
     if (!bio || bio.trim() === '') {
       return res.status(400).send({ error: 'Bio is required' });
     }
@@ -21,23 +25,32 @@ exports.createProfile = async (req, res) => {
     if (!image) {
       return res.status(404).send('Image required');
     }
-    console.log(image)
 
-    
-    const profile = await prisma.profile.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
       data: {
-        bio,
-        location,
-        pronoun,
-        user: { connect: { id } },
-        image: image.filename,
+        email,
+        password: hashedPassword,
+        profile: {
+          create: {
+            bio,
+            location,
+            pronoun,
+            image: image.filename,
+          },
+        },
+      },
+      include: {
+        profile: true,
       },
     });
-    if (!profile) {
-      return res.status(500).send('Failed to create profile');
+
+    if (!user || user.length === 0) {
+      return res.status(404).json({ message: 'No profiles found' });
     }
-    console.log(profile);
-    res.render("../odinbook/views/profile", profile );
+    console.log(user);
+    res.render("../odinbook/views/profile", { user });
   } catch (error) {
     console.error(error);
     res.status(500).send('Error creating profile');
@@ -47,10 +60,17 @@ exports.createProfile = async (req, res) => {
 // To get all profiles
 exports.getProfiles = async (req, res) => {
   try {
-    const profiles = await prisma.profile.findMany();
-    res.render("../odinbook/views/profiles", { profiles });
-    // res.status(200).json(profiles);
+    const users = await prisma.user.findMany({
+      include: {
+        profile: true,
+      },
+    });
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: 'No profiles found' });
+    }
+    res.render("../odinbook/views/profiles", { users});
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Failed to retrieve profiles' });
   }
 };

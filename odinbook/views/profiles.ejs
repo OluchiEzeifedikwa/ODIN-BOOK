@@ -13,25 +13,19 @@
         <div class="board" id="dashboard"></div>
         
           <div class="board" id="profile">
-            <h1 class="post-header">PROFILES</h1>
+            <h1 class="post-header">PROFILE</h1>
             <br>
-            <p><%= profiles.bio %></p>
-            <p><%= profiles.location %></p>
-            <p><%= profiles.pronoun %></p> 
-            
+            <% if (users && users.length >0) { %>
+            <% users.forEach((user) => { %>
+            <p> <%= user.email %></p>
+            <h2>Profile Info</h2>
+            <p> <%= user.profile.bio %></p>
+            <p> <%= user.profile.location %></p>
+            <p> <%= user.profile.pronoun %></p>
+            <img src="/uploads/<%= user.profile.image %>" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%;">
+            <% }); %>
+            <% } %>
           </div>
-                
-        <!-- <div class="board" id="subscribe">
-          <h2>Subscribe to Premium</h2>
-          <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
-          <button style="background-color: lightskyblue; border-radius: 20px; padding: 10px; margin-top: 20px;">Subscribe</button>
-        </div>
-    
-        <div class="board" id="trending">
-          <h2>What's happening?</h2>
-          <p style="color: gray;">Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
-        </div> -->
-
-    </div>    
+        </div>    
 </body>
 </html>

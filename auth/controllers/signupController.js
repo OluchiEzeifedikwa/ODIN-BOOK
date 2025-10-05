@@ -20,7 +20,7 @@ async function signup(req, res) {
     }); 
     // return res.json(user);
     console.log(user);
-    return res.send('succesful');
+    return res.redirect('/login');
   } catch (error) {
     return res.status(500).send( 'Error creating user' );
   }
