@@ -12,12 +12,23 @@ async function signup(req, res) {
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = await prisma.user.create({
-      data: {
-        username: req.body.username,
-        email: req.body.email,
-        password: hashedPassword,
-      },
-    }); 
+        data: {
+          email,
+          password: hashedPassword,
+          username,
+          profile: {
+            create: {
+              bio: '',
+              location: '',
+              pronoun: '',
+              image: ''
+            }
+          }
+        },
+        include: {
+          profile: true
+        }
+      });
     // return res.json(user);
     console.log(user);
     return res.redirect('/login');
@@ -38,5 +49,8 @@ async function getUser(req, res) {
   )
 }
 
-module.exports = { signup, getUser}
+
+
+
+module.exports = { signup, getUser }
 

@@ -19,6 +19,9 @@ const upload = require('./upload');
 const assetsPath = path.join(__dirname, "public");
 
 app.use(express.static(assetsPath));
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+
 console.log(assetsPath);
 
 app.set("views", path.join(__dirname, "views"));

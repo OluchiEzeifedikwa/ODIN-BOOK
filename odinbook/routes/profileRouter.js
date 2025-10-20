@@ -12,11 +12,12 @@ const upload = multer({ dest: 'uploads/' });
 profileRouter.get('/createProfile', (req, res) => {
     res.render('../odinbook/views/createProfile');
 });
-profileRouter.post('/profiles', upload.single('image'), profileController.createProfile);
+// profileRouter.post('/profiles', upload.single('image'), profileController.createProfile);
 profileRouter.get('/profiles', profileController.getProfiles);
 profileRouter.get('/pictures', profileController.getPictures);
 profileRouter.get('/profiles/:id', profileController.getProfileById);
 profileRouter.put('/profiles/:id', profileController.updateProfile);
 profileRouter.delete('/profiles/:id', profileController.deleteProfile);
+
 
 module.exports = profileRouter;

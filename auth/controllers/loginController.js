@@ -23,7 +23,7 @@ function login(req, res, next) {
     })
     console.log(token);
     console.log('Cookie set:', res.getHeaders()['set-cookie']);
-    return res.redirect('/home')
+    return res.redirect('/profiles')
   })(req, res, next);
 };
 
