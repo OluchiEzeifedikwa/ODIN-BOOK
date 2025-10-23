@@ -1,7 +1,24 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-
+// To render the editProfile form
+exports.getEditProfileForm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profile = await prisma.profile.findUnique({
+      where: { id },
+      include: { user: true },
+    });
+    if (!profile) {
+      // Handle the case where the profile doesn't exist
+      return res.status(404).send('Profile not found');
+    }
+    res.render('../odinbook/views/editProfile', { profile });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching profile');
+  }
+}
 
 // To get all profiles
 exports.getProfiles = async (req, res) => {
@@ -24,26 +41,28 @@ exports.getProfiles = async (req, res) => {
 
 
  // To get profiles by Id
- exports.getProfileById = async (req, res) => {
+ exports.getProfileById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
-    const user = await prisma.user.findUnique({
+    console.log(`Fetching profile with ID: ${id}`);
+
+    const profile = await prisma.profile.findUnique({
       where: { id },
-      include: { 
-        profile: true, 
-      },
+      include: { user: true },   
     });
-    if (!user || !user.profile) {
-      return res.status(404).render("../odinbook/views/error");
+    console.log(`Profile data:`, profile);
+    if (!profile) {
+      const error = new Error("Profile not found");
+      error.statusCode = 404;
+      throw error;
     }
-    console.log(user);
-    res.render("../odinbook/views/profile", { user });
+    res.render("../odinbook/views/profile", { profile });
   } catch (err) {
     console.error(err);
-    res.status(500).render('500', { message: 'Failed to retrieve profile' });
+    next(err);
   }
 };
+
 
 // To get all pictures
 exports.getPictures = async (req, res) => {
@@ -56,20 +75,23 @@ exports.getPictures = async (req, res) => {
   }
 };
 
- // To 
+ // To update the profile
  exports.updateProfile = async (req, res) => {
   try {
      
-     const profileId = req.params.id
+     const { id } = req.params
      const { bio, location, pronoun } = req.body;
      await prisma.profile.update({
-       where: { id : profileId },
+       where: { id },
        data: { 
         bio,
         location,
         pronoun,
       }
      });
+     console.log('Profile update request received!');
+     console.log('Request body:', req.body);
+     // Your code to update the profile goes here
      res.status(200).send('profile updated Successfully');
    } catch (err) {
      res.status(500).send({ message: 'Failed to update profiles' });
@@ -95,3 +117,4 @@ exports.deleteProfile = async (req, res) => {
 
 
 
+ 

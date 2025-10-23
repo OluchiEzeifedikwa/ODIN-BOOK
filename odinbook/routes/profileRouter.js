@@ -9,9 +9,7 @@ const upload = multer({ dest: 'uploads/' });
 
 
 
-profileRouter.get('/createProfile', (req, res) => {
-    res.render('../odinbook/views/createProfile');
-});
+profileRouter.get('/editProfile/:id', profileController.getEditProfileForm);
 // profileRouter.post('/profiles', upload.single('image'), profileController.createProfile);
 profileRouter.get('/profiles', profileController.getProfiles);
 profileRouter.get('/pictures', profileController.getPictures);
@@ -21,3 +19,5 @@ profileRouter.delete('/profiles/:id', profileController.deleteProfile);
 
 
 module.exports = profileRouter;
+
+

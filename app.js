@@ -16,7 +16,7 @@ const upload = require('./upload');
 
 
 
-const assetsPath = path.join(__dirname, "public");
+const assetsPath = path.join(__dirname, "views");
 
 app.use(express.static(assetsPath));
 // Serve static files from the 'public' directory
@@ -46,8 +46,22 @@ app.use(postRouter);
 app.use(homeRouter);
 
 
+app.use((err, req, res, next) => {
+  console.error(err); // Log the error
+  const statusCode = err.statusCode || 500;
+  const error = statusCode === 404 ? err.message : 'An internal server error occurred';
+  
+  if (statusCode === 404) {
+    res.status(statusCode).render("../odinbook/views/error", { error });
+  }
+});
+
+app.get('/error', (req, res) => {
+  throw new Error('Something went wrong')
+})
 
 app.use(cookieParser);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

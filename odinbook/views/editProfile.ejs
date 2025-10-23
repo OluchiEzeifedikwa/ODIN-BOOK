@@ -6,24 +6,25 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body class="post-body">
     <div class="post-container">
         <div class="board" id="dashboard"></div>
-        
-          <div class="board" id="profile">
+        <div class="board" id="profile">
             <h1 class="post-header">PROFILE</h1>
             <br>
             <p><strong>Username:</strong> <%= profile.user ? profile.user.username : 'Unknown user' %></p>
             <% if (profile) { %>
-              <p><strong>Bio:</strong> <%= profile.bio %></p>
-              <p><strong>Location:</strong> <%= profile.location || 'Location not specified' %></p>
-              <p><strong>Pronoun:</strong> <%= profile.pronoun || 'Not specified' %></p>
+                <form action="/profiles/<%= profile.id %>" method="put">
+                    <p><strong>Bio:</strong><input type="text" name="bio" value="<%= profile.bio %>"></p>
+                    <p><strong>Location:</strong><input type="text" name="location" value="<%= profile.location || '' %>"></p>
+                    <p><strong>Pronoun:</strong><input type="text" name="pronoun" value="<%= profile.pronoun || '' %>"></p>
+                    <button type="submit">Save Changes</button>
+                  </form>
             <% } else { %>
               <p>User or profile not found.</p>
             <% } %>
           </div>
-        </div>    
+        </div>
 </body>
 </html>
