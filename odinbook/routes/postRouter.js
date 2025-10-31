@@ -9,9 +9,9 @@ postRouter.get('/createPost', postController.getCreatePost);
 postRouter.get('/posts', postController.getAllPosts);
 postRouter.post('/posts', postController.createPost);
 postRouter.get('/posts/:id', postController.getPostById);
-postRouter.put('/posts/:id', postController.updatePost);
+postRouter.post('/posts/:id', postController.updatePost);
 postRouter.delete('/posts/:id', postController.deletePost);
 
-postRouter.delete('/posts/:id', postController.deletePost)
+
 
 module.exports = postRouter;

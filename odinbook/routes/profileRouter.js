@@ -5,16 +5,25 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const path = require("path");
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 
 
 profileRouter.get('/editProfile/:id', profileController.getEditProfileForm);
-// profileRouter.post('/profiles', upload.single('image'), profileController.createProfile);
+profileRouter.post('/profiles', profileController.getPictures);
 profileRouter.get('/profiles', profileController.getProfiles);
-profileRouter.get('/pictures', profileController.getPictures);
 profileRouter.get('/profiles/:id', profileController.getProfileById);
-profileRouter.put('/profiles/:id', profileController.updateProfile);
+profileRouter.post('/profiles/:id', upload.single('profileImage'), profileController.updateProfile);
 profileRouter.delete('/profiles/:id', profileController.deleteProfile);
 
 

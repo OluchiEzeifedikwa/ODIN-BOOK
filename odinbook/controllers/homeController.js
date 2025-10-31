@@ -22,23 +22,38 @@ exports.getEditProfileForm = async (req, res) => {
 
 // To get all profiles
 exports.getProfiles = async (req, res) => {
-  try {
-    const profiles = await prisma.profile.findMany({
-      include: {
-        user: true,
-      },
-    });
-    if (!profiles || profiles.length === 0) {
-      return res.status(404).json({ message: 'No profiles found' });
-    }
-    console.log(profiles);
-    res.render("../odinbook/views/profiles", { profiles});
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to retrieve profiles' });
-  }
-};
+  console.log('Request object:', req); 
+    try {
+      const user = req.user;
+      console.log('req.user:', req.user); 
+      const profiles = await prisma.profile.findMany({
+        include: {
+          user: true,
+        },
+      });
+  
+      if (!profiles || profiles.length === 0) {
+        return res.status(404).json({ message: 'No profiles found' });
+      }
+  
+  
+      res.render("../odinbook/views/home", { 
+        links: [
+          { href: '/home', text: 'Home', icon: 'fa fa-home' },
+          { href: '/profile', text: 'Profile', icon: 'fa fa-user' },
+          { href: '/settings', text: 'Settings', icon: 'fa fa-cog' },
+        ],
+        profiles,
+        user,
+        user: req.user, // Pass req.user to the view
 
+      });
+      console.log(req.user);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Failed to retrieve profiles' });
+    }
+  };
 
  // To get profiles by Id
  exports.getProfileById = async (req, res, next) => {
@@ -56,7 +71,7 @@ exports.getProfiles = async (req, res) => {
       error.statusCode = 404;
       throw error;
     }
-    res.render("../odinbook/views/profile", { profile });
+    res.render("../odinbook/views/home", { profile });
   } catch (err) {
     console.error(err);
     next(err);

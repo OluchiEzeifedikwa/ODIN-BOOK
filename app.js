@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const passport = require('./passport');
 const path = require("node:path");
+const methodOverride = require('method-override');
 const app = express();
 const jwt = require('jsonwebtoken');
 const authSignup = require('./auth/routes/signupRouter');
@@ -18,11 +19,13 @@ const upload = require('./upload');
 
 const assetsPath = path.join(__dirname, "views");
 
+
 app.use(express.static(assetsPath));
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
-
 console.log(assetsPath);
+
+app.use(express.static('uploads'));
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -44,6 +47,8 @@ app.use(profileRouter);
 app.use(commentRouter);
 app.use(postRouter);
 app.use(homeRouter);
+app.use(methodOverride('_method'));
+
 
 
 app.use((err, req, res, next) => {
@@ -60,7 +65,12 @@ app.get('/error', (req, res) => {
   throw new Error('Something went wrong')
 })
 
+
+
 app.use(cookieParser);
+
+
+
 
 
 const PORT = process.env.PORT || 5000;

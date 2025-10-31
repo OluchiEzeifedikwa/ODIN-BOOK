@@ -15,7 +15,9 @@
             <br>
             <p><strong>Username:</strong> <%= profile.user ? profile.user.username : 'Unknown user' %></p>
             <% if (profile) { %>
-                <form action="/profiles/<%= profile.id %>" method="put">
+                <form enctype="multipart/form-data" action="/profiles/<%= profile.id %>" method="post">
+                    <input type="file" name="profileImage" accept="image/*">
+                    <img src="/<%= profile.image %>" alt="profile image" style="width: 20px; height: 20px;">
                     <p><strong>Bio:</strong><input type="text" name="bio" value="<%= profile.bio %>"></p>
                     <p><strong>Location:</strong><input type="text" name="location" value="<%= profile.location || '' %>"></p>
                     <p><strong>Pronoun:</strong><input type="text" name="pronoun" value="<%= profile.pronoun || '' %>"></p>
@@ -24,6 +26,8 @@
             <% } else { %>
               <p>User or profile not found.</p>
             <% } %>
+
+
           </div>
         </div>
 </body>

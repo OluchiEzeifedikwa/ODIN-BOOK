@@ -6,21 +6,6 @@ const bcrypt = require('bcryptjs');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Serialization and deserialization
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const userId = parseInt(id); // Ensure id is an integer if necessary
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    done(null, user);
-  } catch (err) {
-    console.error('Deserialize user error:', err);
-    done(err);
-  }
-});
 
 // Local strategy
 passport.use(new LocalStrategy({
@@ -45,14 +30,30 @@ passport.use(new LocalStrategy({
   }
 }));
 
+// Serialization and deserialization
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+
+passport.deserializeUser((id, done) => {
+  prisma.user.findUnique({ where: { id: id } })
+    .then(user => done(null, user))
+    .catch(err => done(err));
+});
+
 // JWT strategy
 const cookieExtractor = function(req) {
+  
   let token = null;
   if (req && req.cookies) {
     token = req.cookies['token'];
   }
+  console.log('Cookies:', req.cookies);
   return token;
+  
 };
+
 
 passport.use(new JWTStrategy({
   jwtFromRequest: cookieExtractor,
@@ -68,5 +69,8 @@ passport.use(new JWTStrategy({
     return done(error, false);
   }
 }));
+
+
+
 
 module.exports = passport;

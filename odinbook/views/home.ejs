@@ -1,70 +1,89 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Odin Book</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <nav class="board" id="dashboard">
-          <h1>Odin Book</h1>
-          <% for (let i = 0; i < links.length; i++) { %>
-            <a href="<%= links[i].href %>">
-              <%= links[i].text %>
-              <i class="<%= links[i].icon %>"></i>
-            </a>
+          <% if (user) { %>
+          <h1>Welcome, <%= user.username %></h1>
+          <p>Profile ID: <%= user.id %></p>
+          <% } else { %>
+            <p>User</p>
+          <% } %>
+
+          
+          
+            <h1>Odin Book</h1>
+            <% for (let i = 0; i < links.length; i++) { %>
+                <a href="<%= links[i].href %>">
+                    <%= links[i].text %>
+                    <i class="<%= links[i].icon %>"></i>
+                </a>
             <% } %>
         </nav>
         
         <section class="board" id="following">
             <a href="">Following</a>
-            <!-- <a href="" class="following-link">Following</a> -->
         </section>
-              
+        
         <section class="board" id="createpost">
-          <form action="/api/post" method="post">
-            <label for="">What is the Update?</label>
-            <input type="text">
-            <button>Post</button>
-          </form>
+            <form action="/api/post" method="post">
+                <label for="">What is the Update?</label>
+                <input type="text" name="update" required>
+                <button type="submit">Post</button>
+            </form>
         </section>
-    
+        
         <section class="board" id="showpost">
-          <a href="/posts">Show All posts</a>
+            <a href="/posts">Show All posts</a>
         </section>
-          
-        <section class="board" id="pictures">pictures
-          <img src="./images/walls.png" alt="shopping boxes" style="width: 500px;">
+        
+        <section class="board" id="pictures">
+            <% if (profiles && profiles.length > 0) { %>
+                <% profiles.forEach((profile) => { %>
+                    <a href="/profiles/<%= profile.id %>">
+                        <p> <%= profile.user.username %></p>
+                        <% if (profile) { %>
+                          <% if (profile.image) { %>
+                                <img src="/uploads/<%= profile.image %>" alt="Profile Picture" style="width: 500px; height: 400px;">
+                            <% } else { %>
+                                <p>No profile picture available</p>
+                            <% } %>
+                        <% } else { %>
+                            <p>No profile information available</p>
+                        <% } %>
+                    </a>
+                <% }); %>
+            <% } %>
             <a href=""><i class="fa fa-heart"></i></a>
             <a href=""><i class="fa fa-comment"></i></a>
             <a href=""><i class="fa fa-bookmark"></i></a>
             <a href=""><i class="fa fa-send"></i></a>
         </section>
-    
-        <section class="board" id="subscribe">
-          <h2>Shop at affordable prices!</h2>
-          <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
-          <button>Subscribe</button>
-        </section>
-    
-        <section class="board" id="trending">
-          <h2>What's trending?</h2>
-          <p>Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
-        </section>
-    
-        <div class="search-container">
-          <input type="search" id="search-input" value="Search....">
-          <button type="submit" id="search-button">
-            <!-- <i class="fa fa-search"></i> -->
-          </button> 
-        </div>
-
         
-
-    </div>        
+        <section class="board" id="subscribe">
+            <h2>Shop at affordable prices!</h2>
+            <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
+            <button>Subscribe</button>
+        </section>
+        
+        <section class="board" id="trending">
+            <h2>What's trending?</h2>
+            <p>Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
+        </section>
+        
+        <div class="search-container">
+            <input type="search" id="search-input" placeholder="Search...">
+            <button type="submit" id="search-button">
+                <i class="fa fa-search"></i>
+            </button> 
+        </div>
+    </div>
 </body>
 </html>

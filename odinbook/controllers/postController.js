@@ -22,6 +22,7 @@ exports.createPost = async (req, res) => {
       },
     });
     // res.redirect("/home");
+    console.log(post);
     res.render("../odinbook/views/post", { post });
   } catch (err) {
     console.error(err);
@@ -35,6 +36,7 @@ exports.createPost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await prisma.post.findMany();
+    console.log(posts);
     res.render("../odinbook/views/posts", { posts });
   } catch (err) {
     console.error(err);

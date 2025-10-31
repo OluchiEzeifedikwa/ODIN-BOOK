@@ -15,6 +15,7 @@
           <div class="board" id="profile">
             <h1 class="post-header">PROFILE</h1>
             <br>
+            <img src="/<%= profile.image %>" alt="profile image" style="width: 200px; height: 200px; border-radius: 50%;" >
             <p><strong>Username:</strong> <%= profile.user ? profile.user.username : 'Unknown user' %></p>
             <% if (profile) { %>
               <p><strong>Bio:</strong> <%= profile.bio %></p>
