@@ -31,7 +31,6 @@ exports.getProfiles = async (req, res) => {
           user: true,
         },
       });
-  
       if (!profiles || profiles.length === 0) {
         return res.status(404).json({ message: 'No profiles found' });
       }

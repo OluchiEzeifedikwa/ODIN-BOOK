@@ -11,27 +11,23 @@
 <body class="post-body">
     <div class="post-container">
         <div class="board" id="dashboard"></div>
-        
           <div class="board" id="profile">
-            <h1 class="post-header">YOUR POST</h1>
+            <h1 class="post-header">YOUR COMMENT</h1>
             <br>
-            <p style="color: white;"><%= post.content %></p>
+            <% post.comments.forEach(comment => { %>
+                <p style="color: black;"><%= comment.content %></p>
+            <% }); %>
             <a href=""><i class="fa fa-heart-o"></i></a>
             <a href=""><i class="fa fa-comment-o"></i></a>
             <a href=""><i class="fa fa-bookmark-o"></i></a>
-            <a href=""><i class="fa fa-send-o"></i></a>
             <form action="/posts/<%= post.id %>/comments" method="post">
               <input type="hidden" name="postId" value="<%= post.id %>">
-              <!-- <label for="id">Id</label>
-              <input type="text" name="id"> -->
               <br>
               <input type="text" name="content" placeholder="Write a comment..." style="width: 200px; border-radius:20px; background-color: lightgray;">
               <br>
               <button type="submit">Submit</button>
             </form>
           </div>
-                
-
     </div>    
 </body>
 </html>

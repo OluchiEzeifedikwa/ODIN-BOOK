@@ -37,20 +37,9 @@ async function signup(req, res) {
   }
 };
 
-async function getUser(req, res) {
-  const users = await prisma.user.findUnique({
-    where: {username: 'gica'},
-  });
-  if(users) {
-    console.log('user gica exists')
-  }
-  else(
-    console.log('user not found')
-  )
-}
 
 
 
 
-module.exports = { signup, getUser }
+module.exports = { signup }
 
