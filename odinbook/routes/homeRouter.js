@@ -31,18 +31,19 @@ const authenticate = (req, res, next) => {
   })(req, res, next);
 };
 
-  homeRouter.get('/home', homeController.getProfiles);
+  homeRouter.get('/home', homeController.getHomePage);
   homeRouter.get('/editProfile/:id', homeController.getEditProfileForm);
   homeRouter.post('/home', homeController.getPictures);
   homeRouter.get('/home/:id', homeController.getProfileById);
   homeRouter.post('/home/:id', upload.single('profileImage'), homeController.updateProfile);
-  homeRouter.delete('/home/:id', homeController.deleteProfile);
+  homeRouter.get('/home/delete/:id', homeController.deleteProfile);
+  homeRouter.post('/posts/delete/:id', homeController.deletePost);
  
   
 
 const links = [
     { href: "/home", text: "Home", icon: "fa fa-home" },
-    { href: "/profiles", text: "Profile", icon: "fa fa-user"},
+    { href: "/profiles", text: "Friends", icon: "fa fa-user"},
     { href: "/createPost", text: "Posts"},
     
   ];
@@ -64,14 +65,14 @@ const links = [
 
  
  
-  homeRouter.get("/profile", (req, res) => {
-    res.render("../odinbook/views/profile" );
+  homeRouter.get("/profiles", (req, res) => {
+    res.render("../odinbook/views/profiles" );
   });
   
   
-  homeRouter.get("/createPost", (req, res) => {
-    res.render("../odinbook/views/createPost");
-  });
+  // homeRouter.get("/createPost", (req, res) => {
+  //   res.render("../odinbook/views/createPost");
+  // });
 
 
   

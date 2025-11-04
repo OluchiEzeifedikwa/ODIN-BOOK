@@ -8,37 +8,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-    <div class="container">
+
         <nav class="board" id="dashboard">
+
+
           <% if (user) { %>
-          <h1>Welcome, <%= user.username %></h1>
+          <div style="display: flex; align-items: center;">
+            <img src="/uploads/walls.png" alt="Default Profile Picture" style="margin-right: 10px; width: 30px; height: 30px; border-radius: 50px;">
+            <h1>Welcome, <%= user.username %></h1>
+            </div>
+            <% if (user.profile && user.profile.image) { %>
+              <img src="/uploads/<%= user.profile.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
+            <% } else { %>
+              
+            <% } %>
           <% } else { %>
             <p>User</p>
           <% } %>
-
-          
-          
-            <h1>Odin Book</h1>
+            <h1>Mesh Book</h1>
             <% for (let i = 0; i < links.length; i++) { %>
                 <a href="<%= links[i].href %>">
+                    <br>
+                    <br>
                     <%= links[i].text %>
-                    <i class="<%= links[i].icon %>"></i>
+                    <i class="<%= links[i].icon %>"></i>      
                 </a>
             <% } %>
         </nav>
-        
+        <div class="container">
         <section class="board" id="following">
             <a href="">Following</a>
         </section>
         
         <section class="board" id="createpost">
-            <form action="/api/post" method="post">
+            <form action="/posts" method="post">
                 <label for="">What is the Update?</label>
                 <input type="text" name="update" required>
                 <button type="submit">Post</button>
             </form>
         </section>
-        
         <section class="board" id="showpost">
             <a href="/posts">Show All posts</a>
         </section>
@@ -47,26 +55,69 @@
             <% if (profiles && profiles.length > 0) { %>
                 <% profiles.forEach((profile) => { %>
                     <a href="/profiles/<%= profile.id %>">
-                        <p> <%= profile.user.username %></p>
                         <% if (profile) { %>
                           <% if (profile.image) { %>
-                                <img src="/uploads/<%= profile.image %>" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50px;">
-                            <% } else { %>
-                                <p>No profile picture available</p>
-                            <% } %>
-                        <% } else { %>
-                            <p>No profile information available</p>
-                        <% } %>
-                    </a>
-                <% }); %>
-            <% } %>
-            <a href=""><i class="fa fa-heart"></i></a>
-            <a href=""><i class="fa fa-comment"></i></a>
-            <a href=""><i class="fa fa-bookmark"></i></a>
-            <a href=""><i class="fa fa-send"></i></a>
+                            <div style="display: flex; align-items: center;">
+                                <% if (profile.image) { %>
+                                  <img src="/uploads/<%= profile.image %>" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50px;">
+                                <% } %>
+                                <p style="margin-left: 10px;"><%= profile.user.username %></p>
+                                <button type="submit" style="margin-left: 330px;">Follow</button>
+                              </div>
+                              
+                              <% if (profile.user.posts && profile.user.posts.length > 0) { %>
+                              <% profile.user.posts.forEach((post) => { %>
+                                <% if (user && post.userId === user.id) { %>
+                                        <form action="/posts/delete/<%= post.id %>" method="post">
+                                          <button type="submit">Delete Post</button>
+                                        </form>
+                                  <% } %>
+
+                                
+                                <div>
+                                    <% if (post.image) { %>
+                                        <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
+                                        <% } %>
+                                        <p><%= post.content %></p>
+                                        <a href=""><i class="fa fa-heart"></i></a>
+                                        <a href=""><i class="fa fa-comment"></i></a>
+                                        <a href=""><i class="fa fa-bookmark"></i></a>
+                                        <a href=""><i class="fa fa-send"></i></a>
+                                    </div>
+                                    <form action="/posts/<%= post.id %>/comments" method="post">
+                                        <textarea name="content" placeholder="Write a comment..."></textarea>
+                                        <br>
+                                        <button type="submit">Submit</button>
+                                    </form>
+                                      
+                                      <!-- Display comments -->
+                                      <% if (post.comments && post.comments.length > 0) { %>
+                                        <% post.comments.forEach((comment) => { %>
+                                          <div>
+                                            <p><%= comment.user.username %> : <%= comment.content %></p>
+                                          </div>
+                                        <% }); %>
+                                      <% } %>
+
+                                  
+                                    <% }); %>
+                                    <% } else { %>
+                                        <p>No posts available</p>
+                                        <% } %>
+                                        <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;"></div>
+
+                                        <% } else { %>
+                                            <p>No profile picture available</p>
+                                            <% } %>
+                                            <% } else { %>
+                                                <p>No profile information available</p>
+                                                <% } %>
+                                            </a>
+                                            <% }); %>
+                                            <% } %>
         </section>
         
-        <section class="board" id="subscribe">
+        <!-- <section class="board" id="subscribe">
             <h2>Shop at affordable prices!</h2>
             <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
             <button>Subscribe</button>
@@ -75,7 +126,7 @@
         <section class="board" id="trending">
             <h2>What's trending?</h2>
             <p>Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
-        </section>
+        </section> -->
         
         <div class="search-container">
             <input type="search" id="search-input" placeholder="Search...">

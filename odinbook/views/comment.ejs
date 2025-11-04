@@ -20,7 +20,7 @@
             <a href=""><i class="fa fa-heart-o"></i></a>
             <a href=""><i class="fa fa-comment-o"></i></a>
             <a href=""><i class="fa fa-bookmark-o"></i></a>
-            <form action="/posts/<%= post.id %>/comments" method="post">
+            <form action="/posts/<%= post.id %>/comments"  method="post">
               <input type="hidden" name="postId" value="<%= post.id %>">
               <br>
               <input type="text" name="content" placeholder="Write a comment..." style="width: 200px; border-radius:20px; background-color: lightgray;">

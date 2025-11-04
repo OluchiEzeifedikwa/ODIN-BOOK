@@ -8,7 +8,8 @@
 </head>
 <body class="createpost-body">
         <h1 class='header'>CREATE POSTS</h1>
-        <form action="/posts" method="post">
+        <form enctype="multipart/form-data" action="/posts" method="post">
+          <input type="file" name="postImage" accept="image/*">
           <label for="content">Content</label>
           <input type="text" id="content" name="content">
           <button type="submit">Post</button>

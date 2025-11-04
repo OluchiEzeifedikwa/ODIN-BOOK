@@ -21,6 +21,8 @@ exports.createComment = async (req, res) => {
       where: { id: postId },
       include: { comments: true },
     });
+
+    
     console.log(newComment);
     console.log(post);
     res.render("../odinbook/views/comment", { post, newComment });

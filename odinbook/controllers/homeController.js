@@ -21,38 +21,50 @@ exports.getEditProfileForm = async (req, res) => {
 }
 
 // To get all profiles
-exports.getProfiles = async (req, res) => {
-  console.log('Request object:', req); 
-    try {
-      const user = req.user;
-      console.log('req.user:', req.user); 
-      const profiles = await prisma.profile.findMany({
-        include: {
-          user: true,
-        },
-      });
-      if (!profiles || profiles.length === 0) {
-        return res.status(404).json({ message: 'No profiles found' });
-      }
-  
-  
-      res.render("../odinbook/views/home", { 
-        links: [
-          { href: '/home', text: 'Home', icon: 'fa fa-home' },
-          { href: '/profile', text: 'Profile', icon: 'fa fa-user' },
-          { href: '/settings', text: 'Settings', icon: 'fa fa-cog' },
-        ],
-        profiles,
-        user,
-        user: req.user, // Pass req.user to the view
-
-      });
-      console.log(req.user);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Failed to retrieve profiles' });
+exports.getHomePage = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.redirect('/login');
     }
-  };
+    
+    const profiles = await prisma.profile.findMany({
+      include: {
+        user: {
+          include: {
+            posts: true,
+          },
+        },
+      },
+    });
+    if (!profiles || profiles.length === 0) {
+      return res.status(404).json({ message: 'No profiles found' });
+    }
+
+    const posts = await prisma.post.findMany({
+      include: {
+        comments: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+  
+    res.render("../odinbook/views/home", { 
+      links: [
+        { href: '/home', text: 'Home', icon: 'fa fa-home' },
+        { href: '/profile', text: 'Profile', icon: 'fa fa-user' },
+        { href: '/settings', text: 'Settings', icon: 'fa fa-cog' },
+      ],
+      profiles,
+      user: req.user,
+      posts,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to retrieve profiles' });
+  }
+};
 
  // To get profiles by Id
  exports.getProfileById = async (req, res, next) => {
@@ -129,6 +141,43 @@ exports.deleteProfile = async (req, res) => {
      res.status(500).json({ message: 'Failed to delete profile' });
     }
  };
+
+ // Delete a post
+exports.deletePost = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'You must be logged in to delete a post' });
+    }
+
+    const { id } = req.params;
+    const post = await prisma.post.findUnique({
+      where: { id },
+      include: { user: true },
+
+    });
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    if (post.user.id !== req.user.id) {
+      return res.status(403).json({ message: 'You do not have permission to delete this post' });
+    }
+
+    await prisma.post.delete({
+      where: { id },
+    });
+
+    res.redirect("/home");
+    
+    console.log(req.user);
+    console.log(post);
+  } catch (err) {
+    console.error(err);
+    res.status(500).render("../odinbook/views/error", { error: 'Failed to delete post' });
+  }
+};
+
 
  
 
