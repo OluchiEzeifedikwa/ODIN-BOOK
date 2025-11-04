@@ -20,20 +20,25 @@
             <% if (user.profile && user.profile.image) { %>
               <img src="/uploads/<%= user.profile.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
             <% } else { %>
-              
-            <% } %>
+              <% } %>
           <% } else { %>
             <p>User</p>
           <% } %>
             <h1>Mesh Book</h1>
+
+            <% if (typeof links !== 'undefined') { %>
             <% for (let i = 0; i < links.length; i++) { %>
+                <ul>
                 <a href="<%= links[i].href %>">
                     <br>
                     <br>
-                    <%= links[i].text %>
-                    <i class="<%= links[i].icon %>"></i>      
+                    <i class="<%= links[i].icon %>"></i>  
+                    <%= links[i].text %>    
                 </a>
+                </ul>
             <% } %>
+            <% } %>
+
         </nav>
         <div class="container">
         <section class="board" id="following">
@@ -66,14 +71,7 @@
                               </div>
                               
                               <% if (profile.user.posts && profile.user.posts.length > 0) { %>
-                              <% profile.user.posts.forEach((post) => { %>
-                                <% if (user && post.userId === user.id) { %>
-                                        <form action="/posts/delete/<%= post.id %>" method="post">
-                                          <button type="submit">Delete Post</button>
-                                        </form>
-                                  <% } %>
-
-                                
+                              <% profile.user.posts.forEach((post) => { %>  
                                 <div>
                                     <% if (post.image) { %>
                                         <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
@@ -84,6 +82,13 @@
                                         <a href=""><i class="fa fa-bookmark"></i></a>
                                         <a href=""><i class="fa fa-send"></i></a>
                                     </div>
+                                    <% if (user && post.userId === user.id) { %>
+                                        <form action="/posts/delete/<%= post.id %>" method="post">
+                                          <button type="submit">Delete Post</button>
+                                        </form>
+                                  <% } %>
+                                  
+
                                     <form action="/posts/<%= post.id %>/comments" method="post">
                                         <textarea name="content" placeholder="Write a comment..."></textarea>
                                         <br>
@@ -91,13 +96,21 @@
                                     </form>
                                       
                                       <!-- Display comments -->
+
                                       <% if (post.comments && post.comments.length > 0) { %>
                                         <% post.comments.forEach((comment) => { %>
+                                            <% console.log(comment); %>
+
                                           <div>
-                                            <p><%= comment.user.username %> : <%= comment.content %></p>
+                                            <% if (comment.user) { %>
+                                              <p><%= comment.user.username %> : <%= comment.content %></p>
+                                            <% } else { %>
+                                              <p style="color: yellow;">Unknown user : <%= comment.content %></p>
+                                            <% } %>
                                           </div>
                                         <% }); %>
                                       <% } %>
+                                      <% console.log(post); %>
 
                                   
                                     <% }); %>
@@ -115,6 +128,8 @@
                                             </a>
                                             <% }); %>
                                             <% } %>
+
+                                            
         </section>
         
         <!-- <section class="board" id="subscribe">

@@ -21,8 +21,10 @@ exports.getEditProfileForm = async (req, res) => {
 }
 
 // To get all profiles
+
 exports.getHomePage = async (req, res) => {
   try {
+    user = req.user;
     if (!req.user) {
       return res.redirect('/login');
     }
@@ -31,7 +33,15 @@ exports.getHomePage = async (req, res) => {
       include: {
         user: {
           include: {
-            posts: true,
+            posts: {
+              include: {
+                comments: {
+                  include: {
+                    user: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -39,6 +49,7 @@ exports.getHomePage = async (req, res) => {
     if (!profiles || profiles.length === 0) {
       return res.status(404).json({ message: 'No profiles found' });
     }
+    
 
     const posts = await prisma.post.findMany({
       include: {
@@ -47,9 +58,14 @@ exports.getHomePage = async (req, res) => {
             user: true,
           },
         },
+        user: {
+          include: {
+            profile: true,
+          },
+        },
       },
     });
-  
+  console.log(posts);
     res.render("../odinbook/views/home", { 
       links: [
         { href: '/home', text: 'Home', icon: 'fa fa-home' },
@@ -65,6 +81,8 @@ exports.getHomePage = async (req, res) => {
     res.status(500).json({ message: 'Failed to retrieve profiles' });
   }
 };
+
+
 
  // To get profiles by Id
  exports.getProfileById = async (req, res, next) => {

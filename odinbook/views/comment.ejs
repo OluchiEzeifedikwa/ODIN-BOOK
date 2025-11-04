@@ -14,9 +14,18 @@
           <div class="board" id="profile">
             <h1 class="post-header">YOUR COMMENT</h1>
             <br>
-            <% post.comments.forEach(comment => { %>
-                <p style="color: black;"><%= comment.content %></p>
-            <% }); %>
+            
+            <% posts.forEach(post => { %>
+                <!-- Post content -->
+                <% if (post.comments) { %>
+                  <% post.comments.forEach(comment => { %>
+                    <p style="color: black;"><%= comment.content %></p>
+                  <% }); %>
+                <% } else { %>
+                  <p>No comments yet.</p>
+                <% } %>
+                <!-- Like button -->
+              <% }); %>
             <a href=""><i class="fa fa-heart-o"></i></a>
             <a href=""><i class="fa fa-comment-o"></i></a>
             <a href=""><i class="fa fa-bookmark-o"></i></a>

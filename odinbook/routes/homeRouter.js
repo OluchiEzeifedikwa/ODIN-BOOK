@@ -38,7 +38,7 @@ const authenticate = (req, res, next) => {
   homeRouter.post('/home/:id', upload.single('profileImage'), homeController.updateProfile);
   homeRouter.get('/home/delete/:id', homeController.deleteProfile);
   homeRouter.post('/posts/delete/:id', homeController.deletePost);
- 
+  
   
 
 const links = [

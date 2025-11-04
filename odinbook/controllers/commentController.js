@@ -4,34 +4,68 @@ const prisma = new PrismaClient();
 
 // To create a comment
 exports.createComment = async (req, res) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: 'You must be logged in to create a comment' });
-      }
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'You must be logged in to create a comment' });
+    }
     const { postId, content } = req.body;
-    const userId = req.user.id; // Assuming you have the user ID in req.user
-    const newComment = await prisma.comment.create({
+    const userId = req.user.id; 
+    const comment = await prisma.comment.create({
       data: {
         content,
         post: { connect: { id: postId }},
         user: { connect: { id: userId }},
       },
     });
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      include: { comments: true },
+    const profiles = await prisma.profile.findMany({
+      include: {
+        user: true,
+      },
+    });
+    const posts = await prisma.post.findMany({
+      include: {
+        comments: {
+          include: {
+            user: true,
+          },
+        },
+        user: {
+          include: {
+            profile: true,
+          },
+        },
+      },
     });
 
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        comments: true,
+        user: true,
+      },
+    });
     
-    console.log(newComment);
+    
+    console.log(posts);
     console.log(post);
-    res.render("../odinbook/views/comment", { post, newComment });
+    console.log(comment);
+    res.render("../odinbook/views/comment", { 
+      posts, 
+      links: [
+        { href: '/home', text: 'Home', icon: 'fa fa-home' },
+        { href: '/profile', text: 'Profile', icon: 'fa fa-user' },
+        { href: '/settings', text: 'Settings', icon: 'fa fa-cog' },
+      ],
+      profiles,
+      post,
+      comment,
+      user: req.user,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to create comment' });
   }
 };
-
 // To get all comments
 exports.getAllComments = async (req, res) => {
   try {
