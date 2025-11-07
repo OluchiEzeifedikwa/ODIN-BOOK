@@ -20,11 +20,9 @@ const upload = multer({ storage: storage });
 
 
 profileRouter.get('/editProfile/:id', profileController.getEditProfileForm);
-profileRouter.post('/profiles', profileController.getPictures);
 profileRouter.get('/profiles', profileController.getProfiles);
 profileRouter.get('/profiles/:id', profileController.getProfileById);
 profileRouter.post('/profiles/:id', upload.single('profileImage'), profileController.updateProfile);
-profileRouter.delete('/profiles/:id', profileController.deleteProfile);
 
 
 module.exports = profileRouter;

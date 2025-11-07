@@ -11,6 +11,7 @@ const postRouter = require('./odinbook/routes/postRouter');
 const commentRouter = require('./odinbook/routes/commentRouter');
 const homeRouter = require('./odinbook/routes/homeRouter');
 const profileRouter = require('./odinbook/routes/profileRouter');
+const errorHandler = require('./odinbook/middleware/errorHandler')
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const upload = require('./upload');
@@ -64,6 +65,23 @@ app.use((err, req, res, next) => {
 app.get('/error', (req, res) => {
   throw new Error('Something went wrong')
 })
+
+app.get('/posts/:id', async (req, res) => {
+  const postId = req.params.id;
+  try {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        likes: true,
+      },
+    });
+    res.render('post', { post });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching post');
+  }
+});
+
 
 
 

@@ -40,15 +40,19 @@
             <% } %>
 
         </nav>
+
+        
         <div class="container">
         <section class="board" id="following">
             <a href="">Following</a>
         </section>
         
         <section class="board" id="createpost">
-            <form action="/posts" method="post">
+            <form enctype="multipart/form-data" action="/posts" method="post">
                 <label for="">What is the Update?</label>
-                <input type="text" name="update" required>
+                <input type="file" name="postImage" accept="image/*">
+                <label for="content">Content</label>
+                <input type="text" id="content" name="content" required>
                 <button type="submit">Post</button>
             </form>
         </section>
@@ -63,9 +67,7 @@
                         <% if (profile) { %>
                           <% if (profile.image) { %>
                             <div style="display: flex; align-items: center;">
-                                <% if (profile.image) { %>
                                   <img src="/uploads/<%= profile.image %>" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50px;">
-                                <% } %>
                                 <p style="margin-left: 10px;"><%= profile.user.username %></p>
                                 <button type="submit" style="margin-left: 330px;">Follow</button>
                               </div>
@@ -77,23 +79,30 @@
                                         <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
                                         <% } %>
                                         <p><%= post.content %></p>
-                                        <a href=""><i class="fa fa-heart"></i></a>
+                                        <p>Likes: <%= post._count.likes %></p>
+                                        <p style="color: white;">Comments: <%= post._count.comments %></p>
                                         <a href=""><i class="fa fa-comment"></i></a>
                                         <a href=""><i class="fa fa-bookmark"></i></a>
                                         <a href=""><i class="fa fa-send"></i></a>
                                     </div>
                                     <% if (user && post.userId === user.id) { %>
-                                        <form action="/posts/delete/<%= post.id %>" method="post">
+                                        <form action="/home/delete/<%= post.id %>" method="post">
                                           <button type="submit">Delete Post</button>
                                         </form>
-                                  <% } %>
-                                  
+                                    <% } %>
 
-                                    <form action="/posts/<%= post.id %>/comments" method="post">
+                                    
+                                        <button id="like-btn" data-post-id="<%= post.id %>">
+                                          Like <span id="like-count"><%= post._count.likes %></span>
+                                        </button>
+                                      
+
+                                        <form action="/home/<%= post.id %>/comments" method="post">
+                                        <input type="hidden" name="postId" value="<%= post.id %>">
                                         <textarea name="content" placeholder="Write a comment..."></textarea>
                                         <br>
                                         <button type="submit">Submit</button>
-                                    </form>
+                                        </form>
                                       
                                       <!-- Display comments -->
 
@@ -103,9 +112,9 @@
 
                                           <div>
                                             <% if (comment.user) { %>
-                                              <p><%= comment.user.username %> : <%= comment.content %></p>
+                                              <p style="color: yellow;"><%= comment.user.username%>: <%= comment.content %></p>
                                             <% } else { %>
-                                              <p style="color: yellow;">Unknown user : <%= comment.content %></p>
+                                              <p>Unknown user : <%= comment.content %></p>
                                             <% } %>
                                           </div>
                                         <% }); %>
@@ -150,5 +159,23 @@
             </button> 
         </div>
     </div>
+
+    <script>
+        const likeBtn = document.getElementById('like-btn');
+        likeBtn.addEventListener('click', async () => {
+          const postId = likeBtn.dataset.postId;
+          try {
+            const response = await fetch(`/posts/${postId}/like`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+            });
+            const data = await response.json();
+            document.getElementById('like-count').innerText = data.likes;
+          } catch (error) {
+            console.error(error);
+          }
+        });
+      </script>
+      
 </body>
 </html>

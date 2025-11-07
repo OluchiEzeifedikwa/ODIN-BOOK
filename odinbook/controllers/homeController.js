@@ -20,52 +20,34 @@ exports.getEditProfileForm = async (req, res) => {
   }
 }
 
-// To get all profiles
 
-exports.getHomePage = async (req, res) => {
+
+// To get all profiles
+exports.getHomePage = async (req, res, next) => {
   try {
     user = req.user;
     if (!req.user) {
       return res.redirect('/login');
     }
-    
     const profiles = await prisma.profile.findMany({
       include: {
         user: {
           include: {
             posts: {
-              include: {
-                comments: {
-                  include: {
-                    user: true,
-                  },
-                },
-              },
+            include: {
+            _count: {
+              select: { likes: true, comments: true},
+            }
+            },
             },
           },
         },
-      },
+        },
     });
     if (!profiles || profiles.length === 0) {
       return res.status(404).json({ message: 'No profiles found' });
     }
-    
-
-    const posts = await prisma.post.findMany({
-      include: {
-        comments: {
-          include: {
-            user: true,
-          },
-        },
-        user: {
-          include: {
-            profile: true,
-          },
-        },
-      },
-    });
-  console.log(posts);
+    console.log(profiles);
     res.render("../odinbook/views/home", { 
       links: [
         { href: '/home', text: 'Home', icon: 'fa fa-home' },
@@ -74,11 +56,10 @@ exports.getHomePage = async (req, res) => {
       ],
       profiles,
       user: req.user,
-      posts,
+      
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to retrieve profiles' });
+    next(err);
   }
 };
 
@@ -197,8 +178,31 @@ exports.deletePost = async (req, res) => {
 };
 
 
- 
 
+exports.createComment = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'You must be logged in to delete a post' });
+    }
 
+    const { postId, content } = req.body;
+    const userId = req.user.id; 
+    const comment = await prisma.comment.create({
+      data: {
+        content,
+        post: { connect: { id: postId }},
+        user: { connect: { id: userId }},
+      },
+    })
+    
 
- 
+    res.redirect("/home");
+    
+    console.log(req.user);
+    console.log(post);
+  } catch (err) {
+    console.error(err);
+    res.status(500).render("../odinbook/views/error", { error: 'Failed to delete post' });
+  }
+};
+

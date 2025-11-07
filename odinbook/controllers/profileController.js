@@ -63,18 +63,6 @@ exports.getProfiles = async (req, res) => {
   }
 };
 
-
-// To get all pictures
-exports.getPictures = async (req, res) => {
-  try {
-    const picture = await prisma.picture.findMany();
-    res.status(200).json(picture);
-    //res.render("../messagingApp/views/pictures", {pictures: picture});
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to retrieve profiles' });
-  }
-};
-
  // To update the profile
  exports.updateProfile = async (req, res) => {
   try {
@@ -101,20 +89,6 @@ exports.getPictures = async (req, res) => {
  };
 
 
- // To delete a profile
-exports.deleteProfile = async (req, res) => {
-  try {
-     
-     const profileId = req.params.id
-     await prisma.profile.delete({
-       where: { 
-         id : profileId },
-     });
-     res.status(200).json('profile deleted Successfully');
-   } catch (err) {
-     res.status(500).json({ message: 'Failed to delete profile' });
-    }
- };
 
  
 

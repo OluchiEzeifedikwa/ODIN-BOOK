@@ -32,12 +32,14 @@ const authenticate = (req, res, next) => {
 };
 
   homeRouter.get('/home', homeController.getHomePage);
+  
   homeRouter.get('/editProfile/:id', homeController.getEditProfileForm);
   homeRouter.post('/home', homeController.getPictures);
   homeRouter.get('/home/:id', homeController.getProfileById);
   homeRouter.post('/home/:id', upload.single('profileImage'), homeController.updateProfile);
   homeRouter.get('/home/delete/:id', homeController.deleteProfile);
-  homeRouter.post('/posts/delete/:id', homeController.deletePost);
+  homeRouter.post('/home/delete/:id', homeController.deletePost);
+  homeRouter.post('/home/:id/comments', homeController.createComment);
   
   
 

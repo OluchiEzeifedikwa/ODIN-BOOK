@@ -8,29 +8,7 @@ exports.getCreatePost = async (req, res) => {
 }
 
 // Create a new post
-exports.createPost = async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).render("../odinbook/views/error", { error: 'You must be logged in to create a post' });
-    }
-    const { content } = req.body;
-    const userId = req.user.id;
-    const post = await prisma.post.create({
-      data: {
-        content,
-        user: { connect: { id: userId } },
-      },
-    });
-    // res.redirect("/home");
-    console.log(post);
-    res.render("../odinbook/views/post", { post });
-  } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to create post' });
-  }
-};
-
-exports.createPost = async (req, res) => {
+exports.createPost = async (req, res, next) => {
   try {
     if (!req.user) {
       return res.status(401).render("../odinbook/views/error", { error: 'You must be logged in to create a post' });
@@ -47,26 +25,24 @@ exports.createPost = async (req, res) => {
         user: { connect: { id: userId } },
       },
     });
-
     console.log(post);
-    res.render("../odinbook/views/post", { post });
+    res.redirect('/home');
+    // res.render("../odinbook/views/post", { post });
   } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to create post' });
+    next(err);
   }
 };
 
 
 
 // Get all posts
-exports.getAllPosts = async (req, res) => {
+exports.getAllPosts = async (req, res, next) => {
   try {
     const posts = await prisma.post.findMany();
     console.log(posts);
     res.render("../odinbook/views/posts", { posts });
   } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to retrieve posts' });
+    next(err);
   }
 };
 
@@ -97,20 +73,28 @@ exports.updatePost = async (req, res) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
+
+    const existingPost = await prisma.post.findUnique({
+      where: { id },
+    });
+    if (!existingPost) {
+      return res.status(404).render("../odinbook/views/error", { error: 'Post not found' });
+    }
+
     const post = await prisma.post.update({
       where: { id },
       data: { content },
     });
+    console.log(existingPost);
     res.render("../odinbook/views/post", { post });
   } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to update post' });
+    next(err);
   }
 };
 
 
 // Delete a post
-exports.deletePost = async (req, res) => {
+exports.deletePost = async (req, res, next) => {
   try {
     if (!req.user) {
       return res.status(401).json({ message: 'You must be logged in to delete a post' });
@@ -136,8 +120,19 @@ exports.deletePost = async (req, res) => {
 
     res.redirect("/home");
   } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to delete post' });
+    next(err);
   }
 };
+
+exports.showPost = async(req, res) => {
+  const post = await prisma.post.findUnique({
+    where: {
+      id: req.params.id
+    },
+    include: {
+      likes: true
+    },
+  })
+  res.render('../odinbook/views/post', {post, user: req.user });
+}
 

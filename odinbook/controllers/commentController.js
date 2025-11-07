@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // To create a comment
-exports.createComment = async (req, res) => {
+exports.createComment = async (req, res, next) => {
   try {
     if (!req.user) {
       return res.status(401).json({ message: 'You must be logged in to create a comment' });
@@ -17,53 +17,20 @@ exports.createComment = async (req, res) => {
         user: { connect: { id: userId }},
       },
     });
-    const profiles = await prisma.profile.findMany({
-      include: {
-        user: true,
-      },
-    });
-    const posts = await prisma.post.findMany({
-      include: {
-        comments: {
-          include: {
-            user: true,
-          },
-        },
-        user: {
-          include: {
-            profile: true,
-          },
-        },
-      },
-    });
-
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      include: {
-        comments: true,
-        user: true,
-      },
-    });
     
-    
-    console.log(posts);
-    console.log(post);
     console.log(comment);
+    
     res.render("../odinbook/views/comment", { 
-      posts, 
       links: [
         { href: '/home', text: 'Home', icon: 'fa fa-home' },
         { href: '/profile', text: 'Profile', icon: 'fa fa-user' },
         { href: '/settings', text: 'Settings', icon: 'fa fa-cog' },
       ],
-      profiles,
-      post,
       comment,
       user: req.user,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to create comment' });
+    next(err);
   }
 };
 // To get all comments
