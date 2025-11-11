@@ -11,6 +11,7 @@ const postRouter = require('./odinbook/routes/postRouter');
 const commentRouter = require('./odinbook/routes/commentRouter');
 const homeRouter = require('./odinbook/routes/homeRouter');
 const profileRouter = require('./odinbook/routes/profileRouter');
+const likeRouter = require('./odinbook/routes/likeRouter')
 const errorHandler = require('./odinbook/middleware/errorHandler')
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
@@ -48,6 +49,7 @@ app.use(profileRouter);
 app.use(commentRouter);
 app.use(postRouter);
 app.use(homeRouter);
+app.use(likeRouter);
 app.use(methodOverride('_method'));
 
 

@@ -63,6 +63,7 @@ exports.getProfiles = async (req, res) => {
   }
 };
 
+
  // To update the profile
  exports.updateProfile = async (req, res) => {
   try {

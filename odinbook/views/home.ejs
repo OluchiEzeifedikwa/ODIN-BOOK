@@ -9,9 +9,9 @@
 </head>
 <body>
 
-        <nav class="board" id="dashboard">
-
-
+      <nav id="dashboard">
+           
+        <h1>Mesh Book</h1>
           <% if (user) { %>
           <div style="display: flex; align-items: center;">
             <img src="/uploads/walls.png" alt="Default Profile Picture" style="margin-right: 10px; width: 30px; height: 30px; border-radius: 50px;">
@@ -24,22 +24,19 @@
           <% } else { %>
             <p>User</p>
           <% } %>
-            <h1>Mesh Book</h1>
+            <
 
-            <% if (typeof links !== 'undefined') { %>
-            <% for (let i = 0; i < links.length; i++) { %>
-                <ul>
-                <a href="<%= links[i].href %>">
-                    <br>
-                    <br>
-                    <i class="<%= links[i].icon %>"></i>  
-                    <%= links[i].text %>    
-                </a>
-                </ul>
-            <% } %>
-            <% } %>
+          
+            <!-- navbar.ejs -->
 
-        </nav>
+    <ul>
+      <li><a href="/" class="nav-link <%= path === '/' ? 'active' : '' %>"><i class="fa fa-home"></i>Home</a></li>
+      <br>
+      <li><a href="/about" class="nav-link <%= path === '/about' ? 'active' : '' %>"><i class="fa fa-user-friends"></i>Friends</a></li>
+      <br>
+      <li><a href="/contact" class="nav-link <%= path === '/contact' ? 'active' : '' %>"><i class="fa fa-user-cog"></i>Account</a></li>
+    </ul>
+</nav>
 
         
         <div class="container">
@@ -91,10 +88,12 @@
                                         </form>
                                     <% } %>
 
-                                    
-                                        <button id="like-btn" data-post-id="<%= post.id %>">
-                                          Like <span id="like-count"><%= post._count.likes %></span>
+                                       <!-- like button -->
+                                        <button class="like-btn" data-post-id="<%= post.id %>">
+                                            <i class="fa fa-heart"></i><span class="like-count"><%= post.likeCount %></span>
                                         </button>
+
+                                          
                                       
 
                                         <form action="/home/<%= post.id %>/comments" method="post">
@@ -141,16 +140,7 @@
                                             
         </section>
         
-        <!-- <section class="board" id="subscribe">
-            <h2>Shop at affordable prices!</h2>
-            <p>Subscribe to unlock new features and if eligible, receive a share of revenue.</p>
-            <button>Subscribe</button>
-        </section>
         
-        <section class="board" id="trending">
-            <h2>What's trending?</h2>
-            <p>Trending in Nigeria<strong>It is Raining</strong>4,705 posts</p>
-        </section> -->
         
         <div class="search-container">
             <input type="search" id="search-input" placeholder="Search...">
@@ -161,21 +151,30 @@
     </div>
 
     <script>
-        const likeBtn = document.getElementById('like-btn');
-        likeBtn.addEventListener('click', async () => {
-          const postId = likeBtn.dataset.postId;
-          try {
-            const response = await fetch(`/posts/${postId}/like`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-            });
-            const data = await response.json();
-            document.getElementById('like-count').innerText = data.likes;
-          } catch (error) {
-            console.error(error);
-          }
-        });
+
+
+document.body.addEventListener('click', async (event) => {
+  if (event.target.classList.contains('like-btn') || event.target.classList.contains('unlike-btn')) {
+    const btn = event.target;
+    const postId = btn.dataset.postId;
+    const isLiked = btn.classList.contains('like-btn');
+    try {
+      const response = await fetch(`/posts/${postId}/${isLiked ? 'like' : 'unlike'}`, {
+        method: isLiked ? 'POST' : 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await response.json();
+      btn.classList.toggle('like-btn');
+      btn.classList.toggle('unlike-btn');
+      btn.innerHTML = `${isLiked ? 'Unlike' : 'Like'} (${data.likes})`;
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+});
+
+
       </script>
-      
 </body>
 </html>

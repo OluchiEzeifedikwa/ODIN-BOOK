@@ -49,19 +49,17 @@ exports.getHomePage = async (req, res, next) => {
     }
     console.log(profiles);
     res.render("../odinbook/views/home", { 
-      links: [
-        { href: '/home', text: 'Home', icon: 'fa fa-home' },
-        { href: '/profile', text: 'Profile', icon: 'fa fa-user' },
-        { href: '/settings', text: 'Settings', icon: 'fa fa-cog' },
-      ],
+ 
       profiles,
       user: req.user,
+      path: req.path,
       
     });
   } catch (err) {
     next(err);
   }
 };
+
 
 
 

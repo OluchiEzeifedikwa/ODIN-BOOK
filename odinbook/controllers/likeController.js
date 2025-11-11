@@ -4,11 +4,22 @@ const prisma = new PrismaClient();
 exports.likePost = async (req, res, next) => {
     try {
       if (!req.user) {
-        return res.status(401).render("../odinbook/views/error", { error: 'You must be logged in to create a post' });
+        return res.status(401).json({ message: 'You must be logged in to like a post' });
       }
       const { postId } = req.params;
       const userId = req.user.id;
-      
+      const existingLike = await prisma.like.findUnique({
+        where: {
+          postId_userId: {
+            postId,
+            userId,
+          },
+        },
+      });
+      console.log(existingLike);
+      if (existingLike) {
+        return res.status(400).json({ message: 'You have already liked this post' });
+      }
       const like = await prisma.like.create({
         data: {
           postId,
@@ -16,78 +27,62 @@ exports.likePost = async (req, res, next) => {
         },
       });
       console.log(like);
-      res.json({ message: 'Post Liked' })
-    //   res.redirect('/home');
- } catch (err) {
-      next(err);
-    }
-  };
-
-
-  exports.unlikePost = async (req, res, next) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: 'You must be logged in to delete a post' });
+      if (!like) {
+        return res.status(400).json({ message: 'You have created a like' });
       }
-  
-      const { postId } = req.params;
-      const unlike = await prisma.like.delete({
-        where: { 
-            postId_userId: {
-                postId,
-                userId,
 
-            }},
+      const updatedPost = await prisma.post.update({
+        where: { id: postId },
+        data: {
+          likeCount: {
+            increment: 1,
+          },
+        },
       });
-  
-      console.log(unlike);
-      res.redirect("/home");
+      if (!updatedPost) {
+        return res.status(400).json({ message: 'You have updated a post' });
+      }
+      console.log(updatedPost);
+      res.json({ likes: updatedPost.likeCount });
     } catch (err) {
       next(err);
     }
   };
 
-  const likes = await prisma.like.findMany();
-  console.log(likes);
   
-  
-  
-  
-  exports.updatePost = async (req, res) => {
-    const postId = req.params.id;
-  
+  exports.unlikePost = async (req, res, next) => {
     try {
-      const post = await prisma.post.update({
-        where: { id: postId },
-        data: { likes: { increment: 1 } },
+      if (!req.user) {
+        return res.status(401).json({ message: 'You must be logged in to unlike a post' });
+      }
+      const { postId } = req.params;
+      const userId = req.user.id;
+      const deleted = await prisma.like.deleteMany({
+        where: {
+          AND: [
+            { postId: postId },
+            { userId: userId },
+          ],
+        },
       });
-  
-      res.json({ likes: post.likes });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to like post' });
-    }
-  };
-
-  exports.getLikesById = async (req, res) => {
-    const postId = req.params.id;
-  
-    try {
-        const post = await prisma.post.findUnique({
+      
+      console.log(deleted);
+      if (deleted.count === 0) {
+        // Handle the case where the like doesn't exist
+        return res.status(400).json({ message: 'You haven\'t liked this post' });
+      }
+      const updatedPost = await prisma.post.update({
         where: { id: postId },
-        select: {
-          _count: {
-            select: { likes: true },
+        data: {
+          likeCount: {
+            decrement: 1,
           },
         },
       });
-
-      res.render('post', { post });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error fetching post');
+      console.log(!updatedPost);
+      res.json({ likes: updatedPost.likeCount });
+    } catch (err) {
+      next(err);
     }
-}
-  
-
+  };
   

@@ -24,8 +24,14 @@ postRouter.get('/createPost', postController.getCreatePost);
 postRouter.get('/posts', postController.getAllPosts);
 postRouter.post('/posts', upload.single('postImage'), postController.createPost);
 postRouter.get('/posts/:id', postController.getPostById);
-postRouter.post('/posts/:id', postController.updatePost);
+// postRouter.post('/posts/:id', postController.updatePost);
 postRouter.delete('/posts/delete/:id', postController.deletePost);
+// postRouter.post('/posts/:postId/like', postController.updatePost);
+// postRouter.get('/posts/:id', postController.getLikesById);
+// postRouter.patch('/posts', postController.updatePosts);
+
+
+
 
 
 

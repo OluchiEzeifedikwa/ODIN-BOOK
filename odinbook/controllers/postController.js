@@ -68,29 +68,29 @@ exports.getPostById = async (req, res) => {
 
 
 
-// Update a post
-exports.updatePost = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { content } = req.body;
+// // Update a post
+// exports.updatePost = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const { content } = req.body;
 
-    const existingPost = await prisma.post.findUnique({
-      where: { id },
-    });
-    if (!existingPost) {
-      return res.status(404).render("../odinbook/views/error", { error: 'Post not found' });
-    }
+//     const existingPost = await prisma.post.findUnique({
+//       where: { id },
+//     });
+//     if (!existingPost) {
+//       return res.status(404).render("../odinbook/views/error", { error: 'Post not found' });
+//     }
 
-    const post = await prisma.post.update({
-      where: { id },
-      data: { content },
-    });
-    console.log(existingPost);
-    res.render("../odinbook/views/post", { post });
-  } catch (err) {
-    next(err);
-  }
-};
+//     const post = await prisma.post.update({
+//       where: { id },
+//       data: { content },
+//     });
+//     console.log(existingPost);
+//     res.render("../odinbook/views/post", { post });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 
 // Delete a post
@@ -124,15 +124,9 @@ exports.deletePost = async (req, res, next) => {
   }
 };
 
-exports.showPost = async(req, res) => {
-  const post = await prisma.post.findUnique({
-    where: {
-      id: req.params.id
-    },
-    include: {
-      likes: true
-    },
-  })
-  res.render('../odinbook/views/post', {post, user: req.user });
-}
 
+
+
+
+  
+  
