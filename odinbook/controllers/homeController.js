@@ -1,8 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const minutesAgo = require('../helpers/minutesAgo');
+
 
 // To render the editProfile form
-exports.getEditProfileForm = async (req, res) => {
+exports.getEditProfileForm = async (req, res, next) => {
   try {
     const { id } = req.params;
     const profile = await prisma.profile.findUnique({
@@ -16,52 +18,61 @@ exports.getEditProfileForm = async (req, res) => {
     res.render('../odinbook/views/editProfile', { profile });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error fetching profile');
+    next(err);
   }
 }
 
 
-
-// To get all profiles
 exports.getHomePage = async (req, res, next) => {
   try {
-    user = req.user;
-    if (!req.user) {
-      return res.redirect('/login');
-    }
+    // 1️⃣ Guard – redirect if not logged in
+    if (!req.user) return res.redirect('/login')
+
+    // 2️⃣ Get IDs of users you follow (accepted requests)
+    const followRows = await prisma.followRequest.findMany({
+      where: {
+        followerId: req.user.id,
+        status: 'accepted',
+      },
+      select: { followingId: true },
+    })
+    const followingIds = followRows.map(f => f.followingId)
+
+    // 3️⃣ Fetch only those profiles
     const profiles = await prisma.profile.findMany({
+      where: { userId: { in: followingIds } },
       include: {
         user: {
           include: {
             posts: {
-            include: {
-            _count: {
-              select: { likes: true, comments: true},
-            }
-            },
+              include: {
+                _count: { select: { likes: true, comments: true } },
+                comments: { include: { user: true } },
+              },
             },
           },
         },
-        },
-    });
-    if (!profiles || profiles.length === 0) {
-      return res.status(404).json({ message: 'No profiles found' });
+      },
+    })
+
+    // 4️⃣ Attach a simple “isFollowing” flag (will always be true here)
+    for (const profile of profiles) {
+      profile.isFollowing = true
     }
-    console.log(profiles);
-    res.render("../odinbook/views/home", { 
- 
+
+    // 5️⃣ Render the home view
+    res.render('../odinbook/views/home', {
       profiles,
       user: req.user,
       path: req.path,
-      
-    });
+      minutesAgo,
+    })
   } catch (err) {
-    next(err);
+    next(err)
   }
-};
+}
 
-
-
+        
 
  // To get profiles by Id
  exports.getProfileById = async (req, res, next) => {
@@ -87,19 +98,8 @@ exports.getHomePage = async (req, res, next) => {
 };
 
 
-// To get all pictures
-exports.getPictures = async (req, res) => {
-  try {
-    const picture = await prisma.picture.findMany();
-    res.status(200).json(picture);
-    //res.render("../messagingApp/views/pictures", {pictures: picture});
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to retrieve profiles' });
-  }
-};
-
  // To update the profile
- exports.updateProfile = async (req, res) => {
+ exports.updateProfile = async (req, res, next) => {
   try {
      const { id } = req.params
      const { bio, location, pronoun } = req.body;
@@ -119,88 +119,7 @@ exports.getPictures = async (req, res) => {
      
      res.status(200).send('profile updated Successfully');
    } catch (err) {
-     res.status(500).send({ message: 'Failed to update profiles' });
+     next(err)
     }
  };
-
-
- // To delete a profile
-exports.deleteProfile = async (req, res) => {
-  try {
-     
-     const profileId = req.params.id
-     await prisma.profile.delete({
-       where: { 
-         id : profileId },
-     });
-     res.status(200).json('profile deleted Successfully');
-   } catch (err) {
-     res.status(500).json({ message: 'Failed to delete profile' });
-    }
- };
-
- // Delete a post
-exports.deletePost = async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'You must be logged in to delete a post' });
-    }
-
-    const { id } = req.params;
-    const post = await prisma.post.findUnique({
-      where: { id },
-      include: { user: true },
-
-    });
-
-    if (!post) {
-      return res.status(404).json({ message: 'Post not found' });
-    }
-
-    if (post.user.id !== req.user.id) {
-      return res.status(403).json({ message: 'You do not have permission to delete this post' });
-    }
-
-    await prisma.post.delete({
-      where: { id },
-    });
-
-    res.redirect("/home");
-    
-    console.log(req.user);
-    console.log(post);
-  } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to delete post' });
-  }
-};
-
-
-
-exports.createComment = async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'You must be logged in to delete a post' });
-    }
-
-    const { postId, content } = req.body;
-    const userId = req.user.id; 
-    const comment = await prisma.comment.create({
-      data: {
-        content,
-        post: { connect: { id: postId }},
-        user: { connect: { id: userId }},
-      },
-    })
-    
-
-    res.redirect("/home");
-    
-    console.log(req.user);
-    console.log(post);
-  } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to delete post' });
-  }
-};
 

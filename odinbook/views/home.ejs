@@ -6,7 +6,56 @@
     <title>Odin Book</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+
+.comment-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;   /* adjust size of the emoji */
+}
+.comment-count {
+  margin-left: 2px;
+  font-size: 1.3rem;
+  color: white;
+}
+
+
+.hidden { display: none; }
+
+.comment-form {
+  margin-top: 0.5rem;
+}
+.comment-form textarea {
+  width: 100%;
+  min-height: 80px;
+  margin-bottom: 0.4rem;
+}
+
+
+
+        .heart {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+        }
+        .red { color: #e74c3c; }
+        .white { color: white; }
+
+        .like-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        }
+
+        .heart { color: white; 
+        }          /* default gray */
+        .like-btn.liked .heart { color: #e74c3c; } /* red when liked */
+      </style>
 </head>
+
 <body>
 
       <nav id="dashboard">
@@ -41,7 +90,11 @@
         
         <div class="container">
         <section class="board" id="following">
-            <a href="">Following</a>
+            <button class="follow-btn" data-user-id="<%= user.id %>">
+                following
+              </button>
+
+
         </section>
         
         <section class="board" id="createpost">
@@ -65,47 +118,111 @@
                           <% if (profile.image) { %>
                             <div style="display: flex; align-items: center;">
                                   <img src="/uploads/<%= profile.image %>" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50px;">
-                                <p style="margin-left: 10px;"><%= profile.user.username %></p>
-                                <button type="submit" style="margin-left: 330px;">Follow</button>
+
+                                  <span>
+                                    <%= profile.user.username %>
+                                  </span>
+                                 
+                            </a>
+
+                            <!-- Send followRequest -->
+                                
+                                <button type="button" style="margin-left: 330px;" class="follow-btn"
+            data-user-id="<%= profile.user.id %>"
+            data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
+      <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
+    </button>
+
+
+                                <!-- Assume each request has a unique `requestId` -->
+                                 <div class="request" data-id="<%= profile.user.id %>">
+                                    <button class="accept-btn">Accept</button>
+                                    <button class="reject-btn">Reject</button>
+                                </div>
+  
+           <!-- <button type="submit" style="margin-left: 330px;">Follow</button> -->
                               </div>
+
+                              <br>
                               
+                              <!-- Post image and content -->
                               <% if (profile.user.posts && profile.user.posts.length > 0) { %>
-                              <% profile.user.posts.forEach((post) => { %>  
+                              <% profile.user.posts.forEach((post) => { %>
                                 <div>
                                     <% if (post.image) { %>
                                         <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
                                         <% } %>
-                                        <p><%= post.content %></p>
-                                        <p>Likes: <%= post._count.likes %></p>
-                                        <p style="color: white;">Comments: <%= post._count.comments %></p>
-                                        <a href=""><i class="fa fa-comment"></i></a>
-                                        <a href=""><i class="fa fa-bookmark"></i></a>
-                                        <a href=""><i class="fa fa-send"></i></a>
-                                    </div>
+                                        <p>
+                                            <%= post.content %>
+                                            <span style="font-size: small; color: grey;">
+                                            <%= minutesAgo(post.createdAt) %>
+                                            </span>
+
+                                            
+                                        </p>
+                                        
+                                        <!-- <a href=""><i class="fa fa-send"></i></a> -->
+                                </div>
                                     <% if (user && post.userId === user.id) { %>
-                                        <form action="/home/delete/<%= post.id %>" method="post">
+                                        <form action="/posts/delete/<%= post.id %>" method="post">
+                                            <input type="hidden" name="_method" value="DELETE">
                                           <button type="submit">Delete Post</button>
                                         </form>
                                     <% } %>
+                                    
+                              
+
 
                                        <!-- like button -->
-                                        <button class="like-btn" data-post-id="<%= post.id %>">
-                                            <i class="fa fa-heart"></i><span class="like-count"><%= post.likeCount %></span>
+                                        <button class="like-btn" data-post-id="<%= post.id %>" style="background-color: black;">
+                                            <span style="font-size: medium;"  class="heart">♡<%= post.likeCount %></span>
                                         </button>
 
-                                          
+
+
+                                        <!-- 1️⃣ Button that triggers the form -->
+                                         <button style="font-size: medium;" class="comment-btn" data-post-id="<%= post.id %>">
+                                            💬<span style="font-size: medium;" class="comment-count"><%= post._count.comments %></span>
+
+                                        </button>
+
+                                          <div class="comments-panel" data-post-id="<%= post.id %>" style="display:none;">
+                                            <ul class="comments-list"></ul>
+                                        </div>
+
+
+                                 <!-- The form that will be rendered once the comment button is clicked -->
+                                <form class="comment-form" data-post-id="<%= post.id %>" method="POST" action="/posts/<%= post.id %>/comments" style="display:none;">
+                                    <% if (post.comments && post.comments.length) { %>
+                                        <% post.comments.forEach(comment => { %>
+
+                                            <p style="color: yellow;">
+                                                <%= comment.user.username %> 
+                                                <span style="font-size: small; color: white;">
+                                                    <%= minutesAgo(comment.createdAt) %>
+                                                </span>
+                                            </p>
+                                             <%= comment.content %></p>
+                                        <% }) %>
+                                      <% } else { %>
+                                        <p>No comments yet.</p>
+                                      <% } %>
+                                      
+                                    <% if (user && user.image) { %>
+                                        <img src="/uploads/<%= user.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
+                                      <% } %>
+                                    <input type="hidden" name="postId" value="<%= post.id %>">
+                                    <textarea name="content" placeholder="Write a comment…" required></textarea>
                                       
 
-                                        <form action="/home/<%= post.id %>/comments" method="post">
-                                        <input type="hidden" name="postId" value="<%= post.id %>">
-                                        <textarea name="content" placeholder="Write a comment..."></textarea>
-                                        <br>
-                                        <button type="submit">Submit</button>
-                                        </form>
                                       
-                                      <!-- Display comments -->
+                                    <button type="submit">Post</button>
+                                    <button type="button" class="cancel-btn">Cancel</button>
+                                </form>
 
-                                      <% if (post.comments && post.comments.length > 0) { %>
+
+                                    <!-- Display comments -->
+                                      <!-- <% if (post.comments && post.comments.length > 0) { %>
                                         <% post.comments.forEach((comment) => { %>
                                             <% console.log(comment); %>
 
@@ -117,7 +234,7 @@
                                             <% } %>
                                           </div>
                                         <% }); %>
-                                      <% } %>
+                                      <% } %> -->
                                       <% console.log(post); %>
 
                                   
@@ -136,9 +253,7 @@
                                             </a>
                                             <% }); %>
                                             <% } %>
-
-                                            
-        </section>
+    </section>
         
         
         
@@ -150,31 +265,166 @@
         </div>
     </div>
 
-    <script>
+<script>
 
+function minutesAgo(date) {
+  const diff = Math.floor((new Date() - new Date(date)) / 60000);
+  return `${diff} mins`;
+}
+// To display the comment form    
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', async e => {
+    // 1️⃣ Show the comment form
+    if (e.target.classList.contains('comment-btn')) {
+      const postId = e.target.dataset.postId;
+      const form = document.querySelector(`.comment-form[data-post-id="${postId}"]`);
+      if (form) form.style.display = 'block';
 
-document.body.addEventListener('click', async (event) => {
-  if (event.target.classList.contains('like-btn') || event.target.classList.contains('unlike-btn')) {
-    const btn = event.target;
-    const postId = btn.dataset.postId;
-    const isLiked = btn.classList.contains('like-btn');
-    try {
-      const response = await fetch(`/posts/${postId}/${isLiked ? 'like' : 'unlike'}`, {
-        method: isLiked ? 'POST' : 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data = await response.json();
-      btn.classList.toggle('like-btn');
-      btn.classList.toggle('unlike-btn');
-      btn.innerHTML = `${isLiked ? 'Unlike' : 'Like'} (${data.likes})`;
-      console.log(data);
-    } catch (error) {
-      console.error(error);
+      // Load existing comments (only once)
+      const panel = document.querySelector(`.comments-panel[data-post-id="${postId}"]`);
+      const list = panel.querySelector('.comments-list');
+      if (!list.dataset.loaded) {
+        const resp = await fetch(`/home/${postId}/comments`);
+        const comments = await resp.json();
+        list.innerHTML = comments.map(c => `
+          <li><strong>${c.author.name}:</strong> ${c.content}</li>
+        `).join('');
+        list.dataset.loaded = 'true';
+      }
+      panel.style.display = 'block';
     }
+
+    // 2️⃣ Hide the form
+    if (e.target.classList.contains('cancel-btn')) {
+      const form = e.target.closest('.comment-form');
+      if (form) form.style.display = 'none';
+    }
+
+    // 3️⃣ Submit a new comment (AJAX)
+    if (e.target.classList.contains('submit-btn')) {
+      const postId = e.target.dataset.postId;
+      const textarea = document.querySelector(`.comment-form[data-post-id="${postId}"] textarea`);
+      const content = textarea.value.trim();
+
+      if (!content) return;
+
+      const resp = await fetch(`/home/${postId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
+      });
+      const newComment = await resp.json();
+
+      // Append the comment instantly
+      const list = document.querySelector(`.comments-panel[data-post-id="${postId}"] .comments-list`);
+      list.insertAdjacentHTML('beforeend', `
+        <li><strong>${newComment.author.name}:</strong> ${newComment.content}</li>
+      `);
+      textarea.value = ''; // clear input
+    }
+  });
+}); 
+
+
+// To like a post
+document.body.addEventListener('click', async e => {
+  const btn = e.target.closest('.like-btn');
+  if (!btn) return;
+
+  const postId = btn.dataset.postId;
+  const isLiked = btn.classList.contains('liked');
+
+  try {
+    const method = isLiked ? 'DELETE' : 'POST';
+    const resp = await fetch(`/posts/${postId}/${isLiked ? 'unlike' : 'like'}`, {
+      method,
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await resp.json();
+
+    btn.classList.toggle('liked');
+    btn.querySelector('.heart').textContent = `♥${data.likes}, ${data.name}`;
+
+  } catch (err) {
+    console.error(err);
   }
+  // after the like state updates, fetch the likers list
+  const likersResp = await fetch(`/posts/${postId}/likers`);
+  const likers = await likersResp.json(); // [{id,1, name:'Ada'}, …]
+
+  // simple example: dump the names into a modal
+  const modal = document.createElement('div');
+  modal.className = 'likers-modal';
+  modal.innerHTML = `
+    <h4>Liked by</h4>
+    <ul>${likers.map(u => `<li>${u.name}</li>`).join('')}</ul>
+    <button class="close">×</button>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector('.close').addEventListener('click', () => {
+    modal.remove();
+});
+
 });
 
 
-      </script>
+
+// To follow a user
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.follow-btn');
+  if (!btn) return;
+
+  const receiverId = btn.dataset.userId;
+  const isFollowing = btn.dataset.following === 'true';
+
+  // Choose endpoint and new text
+  const url = isFollowing
+    ? `/users/unfollow/${receiverId}`
+    : `/users/follow/${receiverId}`;
+
+  const newText = isFollowing ? 'Follow' : 'Unfollow';
+  const newState = !isFollowing;
+
+  fetch(url, { method: 'POST'})
+
+  .then(r => r.json())
+  .then(data => 
+    {
+    btn.textContent = data.following ? 'Unfollow' : 'Follow';
+    btn.dataset.following = String(data.following);
+  })
+  .catch(err => console.error(err));
+});
+
+
+
+  document.addEventListener('click', async e => {
+    const btn = e.target;
+    if (!btn.classList.contains('accept-btn') && !btn.classList.contains('reject-btn')) return;
+  
+    e.preventDefault();
+    const requestDiv = btn.closest('.request');
+    const requestId = requestDiv.dataset.id;
+    const action = btn.classList.contains('accept-btn') ? 'accept' : 'reject';
+  
+    try {
+      const resp = await fetch(`/follow-request/${requestId}/${action}`, { method: 'POST' });
+      if (resp.ok) {
+        requestDiv.style.display = 'none'; // hide the request
+        // optional: show a flash message
+      } else {
+        console.error('Something went wrong');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+  
+
+                       
+
+
+</script>
 </body>
 </html>

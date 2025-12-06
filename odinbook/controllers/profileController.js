@@ -56,7 +56,7 @@ exports.getProfiles = async (req, res) => {
       error.statusCode = 404;
       throw error;
     }
-    res.render("../odinbook/views/profile", { profile });
+    res.render("../odinbook/views/profile", { profile, profileId: profile.id, });
   } catch (err) {
     console.error(err);
     next(err);

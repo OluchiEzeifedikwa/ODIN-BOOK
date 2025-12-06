@@ -38,15 +38,38 @@ exports.createPost = async (req, res, next) => {
 // Get all posts
 exports.getAllPosts = async (req, res, next) => {
   try {
-    const posts = await prisma.post.findMany();
-    console.log(posts);
-    res.render("../odinbook/views/posts", { posts });
+    const posts = await prisma.post.findMany({
+    where: {
+      OR :[
+        { userId: req.user.id},
+        {
+          user: {                     // relation to the post author
+        followers: {
+          some: {
+            followerId: req.user.id,
+            status: 'accepted'   // only accepted follows
+          }
+        }
+      }
+    }
+    ]
+    },
+    include: {
+      user: true,
+      _count: { select: { likes: true, comments: true } }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  console.log(posts);
+  res.render("../odinbook/views/posts", { posts });
   } catch (err) {
     next(err);
   }
 };
 
 // Get a post by id
+
 exports.getPostById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,34 +86,6 @@ exports.getPostById = async (req, res) => {
     res.status(500).render("../odinbook/views/error", { error: 'Failed to retrieve post' });
   }
 };
-
-
-
-
-
-// // Update a post
-// exports.updatePost = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const { content } = req.body;
-
-//     const existingPost = await prisma.post.findUnique({
-//       where: { id },
-//     });
-//     if (!existingPost) {
-//       return res.status(404).render("../odinbook/views/error", { error: 'Post not found' });
-//     }
-
-//     const post = await prisma.post.update({
-//       where: { id },
-//       data: { content },
-//     });
-//     console.log(existingPost);
-//     res.render("../odinbook/views/post", { post });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
 
 
 // Delete a post
@@ -123,6 +118,42 @@ exports.deletePost = async (req, res, next) => {
     next(err);
   }
 };
+
+// exports.deletePost = async (req, res) => {
+//   try {
+//     if (!req.user) {
+//       return res.status(401).json({ message: 'You must be logged in to delete a post' });
+//     }
+
+//     const { id } = req.params;
+//     const post = await prisma.post.findUnique({
+//       where: { id },
+//       include: { user: true },
+
+//     });
+
+//     if (!post) {
+//       return res.status(404).json({ message: 'Post not found' });
+//     }
+
+//     if (post.user.id !== req.user.id) {
+//       return res.status(403).json({ message: 'You do not have permission to delete this post' });
+//     }
+
+//     await prisma.post.delete({
+//       where: { id },
+//     });
+
+//     res.redirect("/home");
+    
+//     console.log(req.user);
+//     console.log(post);
+//   } catch (err) {
+//     next(err)
+//   }
+// };
+
+
 
 
 
