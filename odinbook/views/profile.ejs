@@ -21,11 +21,44 @@
               <p><strong>Bio:</strong> <%= profile.bio %></p>
               <p><strong>Location:</strong> <%= profile.location || 'Location not specified' %></p>
               <p><strong>Pronoun:</strong> <%= profile.pronoun || 'Not specified' %></p>
+              <button type="button" class="follow-btn" data-user-id="<%= profile.user.id %>" data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
+                <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
+            </button>
             <% } else { %>
               <p>User or profile not found.</p>
             <% } %>
           </div>
-        </div>    
+        </div> 
+        <script>
+          // To follow a user
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.follow-btn');
+  if (!btn) return;
+
+  const receiverId = btn.dataset.userId;
+  const isFollowing = btn.dataset.following === 'true';
+
+  // Choose endpoint and new text
+  const url = isFollowing
+    ? `/users/unfollow/${receiverId}`
+    : `/users/follow/${receiverId}`;
+
+  const newText = isFollowing ? 'Follow' : 'Unfollow';
+  const newState = !isFollowing;
+
+  fetch(url, { method: 'POST'})
+
+  .then(r => r.json())
+  .then(data => 
+    {
+    btn.textContent = data.following ? 'Unfollow' : 'Follow';
+    btn.dataset.following = String(data.following);
+  })
+  .catch(err => console.error(err));
+});
+
+
+        </script>   
 </body>
 </html>
 

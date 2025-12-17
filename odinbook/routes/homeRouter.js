@@ -35,6 +35,7 @@ const authenticate = (req, res, next) => {
   homeRouter.get('/editProfile/:id', homeController.getEditProfileForm);
   homeRouter.get('/home/:id', homeController.getProfileById);
   homeRouter.post('/home/:id', upload.single('profileImage'), homeController.updateProfile);
+  homeRouter.post('/notifications/:id/read', homeController.markAsRead);
   
   
 

@@ -40,7 +40,13 @@ exports.getHomePage = async (req, res, next) => {
 
     // 3️⃣ Fetch only those profiles
     const profiles = await prisma.profile.findMany({
-      where: { userId: { in: followingIds } },
+      where: {
+        OR: [
+          { userId: { in: followingIds } },
+          { userId: req.user.id }          // ← include the logged‑in user
+        ]
+      },
+    
       include: {
         user: {
           include: {
@@ -55,10 +61,19 @@ exports.getHomePage = async (req, res, next) => {
       },
     })
 
-    // 4️⃣ Attach a simple “isFollowing” flag (will always be true here)
-    for (const profile of profiles) {
-      profile.isFollowing = true
-    }
+    const notifications = await prisma.notification.findMany({
+      // where: { profileId: req.user.profileId },   // ← adjust if your user model holds the profile id
+      where: { userId: req.user.id }, // adjust to your auth logic
+      orderBy: { createdAt: 'desc' },
+      take: 5,                                   // show only the newest few
+      include: { user: true, post: true, comment: true, like: true, followRequest: true }
+    })
+
+    // Add a `notifications` array to every profile (you can also pick a single profile if you only need it there)
+for (const profile of profiles) {
+  profile.isFollowing = true
+  profile.notifications = notifications   // ← add this line
+}
 
     // 5️⃣ Render the home view
     res.render('../odinbook/views/home', {
@@ -66,13 +81,29 @@ exports.getHomePage = async (req, res, next) => {
       user: req.user,
       path: req.path,
       minutesAgo,
+      term: '' ,         // or whatever default you want
+      notifications   // ← add this
     })
   } catch (err) {
     next(err)
   }
 }
 
-        
+exports.markAsRead = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    await prisma.notification.update({
+      where: { id },
+      data: { read: true },
+    })
+    // Send the user back to the page they came from
+    res.redirect('home')
+  } catch (err) {
+    next(err)
+  }
+}
+
+      
 
  // To get profiles by Id
  exports.getProfileById = async (req, res, next) => {
@@ -96,6 +127,7 @@ exports.getHomePage = async (req, res, next) => {
     next(err);
   }
 };
+
 
 
  // To update the profile

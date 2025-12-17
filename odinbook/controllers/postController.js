@@ -35,6 +35,7 @@ exports.createPost = async (req, res, next) => {
 
 
 
+
 // Get all posts
 exports.getAllPosts = async (req, res, next) => {
   try {
@@ -51,15 +52,23 @@ exports.getAllPosts = async (req, res, next) => {
           }
         }
       }
+      
     }
     ]
     },
     include: {
       user: true,
-      _count: { select: { likes: true, comments: true } }
+      _count: { select: { likes: true, comments: true } },
+      likes: { where: { userId: req.user.id } }   // ← only th
     },
     orderBy: { createdAt: 'desc' }
   });
+
+  // Add a boolean flag for easy templating
+posts.forEach(p => {
+  p.isLiked = p.likes.length > 0
+  delete p.likes   // optional – we don’t need the whole array anymore
+})
 
   console.log(posts);
   res.render("../odinbook/views/posts", { posts });

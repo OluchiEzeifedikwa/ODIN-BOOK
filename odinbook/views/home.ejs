@@ -32,27 +32,40 @@
   margin-bottom: 0.4rem;
 }
 
-
-
-        .heart {
-          background: none;
-          border: none;
-          font-size: 1.5rem;
-          cursor: pointer;
-        }
-        .red { color: #e74c3c; }
-        .white { color: white; }
-
-        .like-btn {
+.like-btn {
         background: none;
         border: none;
         font-size: 1.5rem;
         cursor: pointer;
         }
 
-        .heart { color: white; 
-        }          /* default gray */
-        .like-btn.liked .heart { color: #e74c3c; } /* red when liked */
+
+
+.heart {
+    color: white; 
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.like-btn.liked .heart { 
+    color: #e74c3c; 
+} /* red when liked */
+
+.heart::before { 
+    content: "♡"; 
+}   /* default outline */
+
+.like-btn.liked .heart::before { 
+    content: "❤️"; color: #e74c3c; 
+}
+
+        
+        
+
+
+
       </style>
 </head>
 
@@ -85,14 +98,21 @@
       <br>
       <li><a href="/contact" class="nav-link <%= path === '/contact' ? 'active' : '' %>"><i class="fa fa-user-cog"></i>Account</a></li>
     </ul>
+   
+  
 </nav>
 
         
         <div class="container">
         <section class="board" id="following">
-            <button class="follow-btn" data-user-id="<%= user.id %>">
-                following
-              </button>
+            <a href="/profiles">following</a>
+            <form action="/search" method="get">
+                <input style="background-color: #ccc;" name="q" value="<%= term %>" placeholder="Search for users">
+                <button type="submit">Go</button>
+              </form>
+
+              
+              
 
 
         </section>
@@ -111,6 +131,52 @@
         </section>
         
         <section class="board" id="pictures">
+
+            <% profiles.forEach(p => { %>
+                <% if (p.notifications && p.notifications.length) { %>
+                  <% p.notifications.forEach(n => { %>
+                    <li class="<%= n.read ? 'read' : 'unread' %>">
+                      <% if (n.user) { %>
+                        <%= n.user.name %> mentioned you
+                      <% } else if (n.post) { %>
+                        New post from <%= n.post.user.name %>
+                      <% } else if (n.comment) { %>
+                        <%= n.comment.user.name %> commented
+                      <% } %>
+                      <form method="POST" action="/notifications/<%= n.id %>/read" style="display:inline;">
+                        <button type="submit" class="n-btn" data-post-id="<%= n.id %>">Mark as read</button>
+                      </form>
+                    </li>
+                  <% }) %>
+                <% } else { %>
+                  <li>No new notifications.</li>
+                <% } %>
+              <% }) %>
+
+
+            <h2>Recent Notifications</h2>
+            <ul>
+                <% if (typeof notifications !== 'undefined' && notifications.length) { %>
+                    <% notifications.forEach(n => { %>
+                        <li class="<%= n.read ? 'read' : 'unread' %>">
+                            <% if (n.user) { %>
+                                <%= n.user.name %> mentioned you
+                                <% } else if (n.post) { %>
+                                    New post from <%= n.post.user.name %>
+                                    <% } else if (n.comment) { %>
+                                        <%= n.comment.user.name %> commented
+                                        <% } %>
+                                        <form method="POST" action="/notifications/<%= n.id %>/read" style="display:inline; background-color: azure;" >
+                                            <button type="submit" class="n-btn" data-post-id="<%= n.id %>">Mark as read</button>
+                                        </form>
+                                    </li>
+                                    <% }) %>
+                                    <% } else { %>
+                                        <li>No new notifications.</li>
+                                        <% } %>
+                                    </ul>
+            
+
             <% if (profiles && profiles.length > 0) { %>
                 <% profiles.forEach((profile) => { %>
                     <a href="/profiles/<%= profile.id %>">
@@ -126,43 +192,50 @@
                             </a>
 
                             <!-- Send followRequest -->
+                            <% if (profile.user.id !== user.id) { %> 
+                                <button type="button" style="margin-left: 330px;" class="follow-btn" data-user-id="<%= profile.user.id %>" data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
+                                    <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
+                                </button>
                                 
-                                <button type="button" style="margin-left: 330px;" class="follow-btn"
-            data-user-id="<%= profile.user.id %>"
-            data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
-      <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
-    </button>
+                            <% } %>
+                                
 
 
-                                <!-- Assume each request has a unique `requestId` -->
-                                 <div class="request" data-id="<%= profile.user.id %>">
-                                    <button class="accept-btn">Accept</button>
-                                    <button class="reject-btn">Reject</button>
-                                </div>
   
-           <!-- <button type="submit" style="margin-left: 330px;">Follow</button> -->
+
                               </div>
 
                               <br>
+
+                              
                               
                               <!-- Post image and content -->
                               <% if (profile.user.posts && profile.user.posts.length > 0) { %>
                               <% profile.user.posts.forEach((post) => { %>
                                 <div>
+                                    
+                                    
+                            
+
+                                    
+
+                                
                                     <% if (post.image) { %>
                                         <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
                                         <% } %>
                                         <p>
+                                           
                                             <%= post.content %>
                                             <span style="font-size: small; color: grey;">
                                             <%= minutesAgo(post.createdAt) %>
                                             </span>
-
-                                            
                                         </p>
                                         
                                         <!-- <a href=""><i class="fa fa-send"></i></a> -->
                                 </div>
+
+
+                              
                                     <% if (user && post.userId === user.id) { %>
                                         <form action="/posts/delete/<%= post.id %>" method="post">
                                             <input type="hidden" name="_method" value="DELETE">
@@ -174,16 +247,14 @@
 
 
                                        <!-- like button -->
-                                        <button class="like-btn" data-post-id="<%= post.id %>" style="background-color: black;">
-                                            <span style="font-size: medium;"  class="heart">♡<%= post.likeCount %></span>
+                                        <button style="font-size: medium;" class="like-btn" <%= post.isLiked ? 'liked' : '' %>"
+                                             data-post-id="<%= post.id %>" style="background-color: black;">
+                                            <span style="font-size: medium;" class="heart"><%= post.likeCount %></span>
                                         </button>
-
-
 
                                         <!-- 1️⃣ Button that triggers the form -->
                                          <button style="font-size: medium;" class="comment-btn" data-post-id="<%= post.id %>">
                                             💬<span style="font-size: medium;" class="comment-count"><%= post._count.comments %></span>
-
                                         </button>
 
                                           <div class="comments-panel" data-post-id="<%= post.id %>" style="display:none;">
@@ -191,18 +262,20 @@
                                         </div>
 
 
+
+
                                  <!-- The form that will be rendered once the comment button is clicked -->
                                 <form class="comment-form" data-post-id="<%= post.id %>" method="POST" action="/posts/<%= post.id %>/comments" style="display:none;">
                                     <% if (post.comments && post.comments.length) { %>
                                         <% post.comments.forEach(comment => { %>
-
                                             <p style="color: yellow;">
+                                                <img src="/uploads/<%= profile.image %>" alt="Post Image" style="width: 50px; height: 50px; border-radius: 50px;">
                                                 <%= comment.user.username %> 
                                                 <span style="font-size: small; color: white;">
                                                     <%= minutesAgo(comment.createdAt) %>
                                                 </span>
                                             </p>
-                                             <%= comment.content %></p>
+                                            <p><%= comment.content %></p>
                                         <% }) %>
                                       <% } else { %>
                                         <p>No comments yet.</p>
@@ -219,22 +292,12 @@
                                     <button type="submit">Post</button>
                                     <button type="button" class="cancel-btn">Cancel</button>
                                 </form>
+                                
+                                       
+                                
 
 
-                                    <!-- Display comments -->
-                                      <!-- <% if (post.comments && post.comments.length > 0) { %>
-                                        <% post.comments.forEach((comment) => { %>
-                                            <% console.log(comment); %>
-
-                                          <div>
-                                            <% if (comment.user) { %>
-                                              <p style="color: yellow;"><%= comment.user.username%>: <%= comment.content %></p>
-                                            <% } else { %>
-                                              <p>Unknown user : <%= comment.content %></p>
-                                            <% } %>
-                                          </div>
-                                        <% }); %>
-                                      <% } %> -->
+                                   
                                       <% console.log(post); %>
 
                                   
@@ -267,10 +330,7 @@
 
 <script>
 
-function minutesAgo(date) {
-  const diff = Math.floor((new Date() - new Date(date)) / 60000);
-  return `${diff} mins`;
-}
+
 // To display the comment form    
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', async e => {
@@ -343,7 +403,7 @@ document.body.addEventListener('click', async e => {
     const data = await resp.json();
 
     btn.classList.toggle('liked');
-    btn.querySelector('.heart').textContent = `♥${data.likes}, ${data.name}`;
+    btn.querySelector('.heart').textContent = `${data.likes}`;
 
   } catch (err) {
     console.error(err);
@@ -397,32 +457,6 @@ document.addEventListener('click', e => {
   .catch(err => console.error(err));
 });
 
-
-
-  document.addEventListener('click', async e => {
-    const btn = e.target;
-    if (!btn.classList.contains('accept-btn') && !btn.classList.contains('reject-btn')) return;
-  
-    e.preventDefault();
-    const requestDiv = btn.closest('.request');
-    const requestId = requestDiv.dataset.id;
-    const action = btn.classList.contains('accept-btn') ? 'accept' : 'reject';
-  
-    try {
-      const resp = await fetch(`/follow-request/${requestId}/${action}`, { method: 'POST' });
-      if (resp.ok) {
-        requestDiv.style.display = 'none'; // hide the request
-        // optional: show a flash message
-      } else {
-        console.error('Something went wrong');
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  });
-  
-
-                       
 
 
 </script>

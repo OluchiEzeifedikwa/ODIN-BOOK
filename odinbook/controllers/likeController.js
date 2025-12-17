@@ -43,7 +43,7 @@ exports.likePost = async (req, res, next) => {
         return res.status(400).json({ message: 'You have updated a post' });
       }
       console.log(updatedPost);
-      res.json({ likes: updatedPost.likeCount, name: user.username });
+      res.json({ likes: updatedPost.likeCount });
     } catch (err) {
       next(err);
     }

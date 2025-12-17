@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head><title>Your Notifications</title></head>
+<body>
+  <h1>Notifications</h1>
+  <ul>
+    <% notifications.forEach(n => { %>
+      <li class="<%= n.read ? 'read' : 'unread' %>">
+        <% if (n.user) { %>
+          <%= n.user.name %> mentioned you
+        <% } else if (n.post) { %>
+          New post from <%= n.post.user.name %>
+        <% } else if (n.comment) { %>
+          <%= n.comment.author.name %> commented
+        <% } %>
+        <form method="POST" action="/notifications/<%= n.id %>/read" style="display:inline;">
+          <button type="submit">Mark as read</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>
