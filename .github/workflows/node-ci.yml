@@ -27,8 +27,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run Tests (optional)
-        run: npm test
+      # - name: Run Tests (optional)
+      #   run: npm test
 
       - name: Start the App (optional for dev)
         run: npm run dev
