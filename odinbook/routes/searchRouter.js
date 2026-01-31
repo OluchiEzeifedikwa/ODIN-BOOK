@@ -1,6 +1,13 @@
+import { Router } from 'express';
+import searchController from '../controllers/searchController.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
 
-const { Router } = require('express');
 const searchRouter = Router();
-const searchController = require('../controllers/likeController');
 
-searchRouter.get('/search', authMiddleware, searchController.searchUsers)
+searchRouter.get(
+  '/search',
+  authMiddleware,
+  searchController.searchUsers
+);
+
+export default searchRouter;

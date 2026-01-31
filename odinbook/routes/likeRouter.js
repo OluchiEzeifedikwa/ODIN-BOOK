@@ -1,12 +1,9 @@
-const { Router } = require('express');
+import { Router } from 'express';
+import likeController from '../controllers/likeController.js';
+
 const likeRouter = Router();
-const likeController = require('../controllers/likeController');
 
 likeRouter.post('/posts/:postId/like', likeController.likePost);
 likeRouter.delete('/posts/:postId/unlike', likeController.unlikePost);
 
-
-module.exports = likeRouter;
-
-
-
+export default likeRouter;

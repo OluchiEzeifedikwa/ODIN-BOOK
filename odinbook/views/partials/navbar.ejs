@@ -1,0 +1,23 @@
+<nav id="dashboard">
+    <h1>Mesh Book</h1>
+      <% if (user) { %>
+      <div style="display: flex; align-items: center;">
+        <img src="/uploads/walls.png" alt="Default Profile Picture" style="margin-right: 10px; width: 30px; height: 30px; border-radius: 50px;">
+        <h1>Welcome, <%= user.username %></h1>
+        </div>
+        <% if (user.profile && user.profile.image) { %>
+          <img src="/uploads/<%= user.profile.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
+        <% } else { %>
+          <% } %>
+      <% } else { %>
+        <p>User</p>
+      <% } %>
+      <ul>
+        <li><a href="/" class="nav-link <%= path === '/' ? 'active' : '' %>"><i class="fa fa-home"></i>Home</a></li>
+        <br>
+        <li><a href="/friends" class="nav-link <%= path === '/friends' ? 'active' : '' %>"><i class="fa fa-user-friends"></i>Friends</a></li>
+        <br>
+        <li><a href="/account" class="nav-link <%= path === '/account' ? 'active' : '' %>"><i class="fa fa-user-cog"></i>Account</a></li>
+      </ul>
+  </nav>
+  

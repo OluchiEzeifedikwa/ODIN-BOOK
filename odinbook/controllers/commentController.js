@@ -1,101 +1,89 @@
+import { PrismaClient } from '@prisma/client';
 
-const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // To create a comment
-exports.createComment = async (req, res) => {
+const createComment = async (req, res, next) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: 'You must be logged in to delete a post' });
+      return res.status(401).json({ message: 'You must be logged in to create a post' });
     }
 
-    const { postId, content } = req.body;
     const userId = req.user.id; 
+    const { postId, content } = req.body;
+
     const comment = await prisma.comment.create({
-      data: {
-        content,
-        post: { connect: { id: postId }},
-        user: { connect: { id: userId }},
-      },
-    })
-    
-
-    res.redirect("/home");
-    
-    console.log(req.user);
-    console.log(post);
-  } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to delete post' });
-  }
-};
-
-
-// To get all comments
-exports.getAllComments = async (req, res) => {
-  try {
-    const comments = await prisma.comment.findMany();
-    res.render("../odinbook/views/comment", { comments });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to retrieve comments' });
-  }
-};
-
-// To get comments by Id
-exports.getCommentById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const comment = await prisma.comment.findUnique({
-      where: { id },
+      data: { content, postId, userId },
     });
 
-    if (!comment) {
-      return res.status(404).json({ message: 'Comment not found' });
-    }
-    res.render("../odinbook/views/comment", { comment });
+    res.redirect("/home");
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Failed to retrieve comment' });
+    next(err);
   }
 };
 
-// To update a comment
-exports.updateComment = async (req, res) => {
+// Get all comments
+const getAllComments = async (req, res, next) => {
+  try {
+    const comments = await prisma.comment.findMany();
+    res.render("comment", { comments });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
+
+// Get comment by ID
+const getCommentById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const comment = await prisma.comment.findUnique({ where: { id } });
+
+    if (!comment) return res.status(404).json({ message: 'Comment not found' });
+
+    res.render("comment", { comment });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
+
+// Update comment
+const updateComment = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { content } = req.body;
+
     const updatedComment = await prisma.comment.update({
       where: { id },
       data: { content },
     });
-    res.render("../odinbook/views/comment", { comment: updatedComment });
+
+    res.render("comment", { comment: updatedComment });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Failed to update comment' });
+    next(err);
   }
 };
 
-// To delete a comment
-exports.deleteComment = async (req, res) => {
+// Delete comment
+const deleteComment = async (req, res, next) => {
   try {
     const { id } = req.params;
-    await prisma.comment.delete({
-      where: { id },
-    });
+    await prisma.comment.delete({ where: { id } });
     res.redirect("/comments");
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Failed to delete comment' });
+    next(err);
   }
 };
 
 
-
-
-
- 
- 
-
-
-
+export default {
+  createComment,
+  getAllComments,
+  getCommentById,
+  updateComment,
+  deleteComment,
+};

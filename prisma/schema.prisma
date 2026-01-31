@@ -26,8 +26,6 @@ model User {
   notifications Notification[]
   follower FollowRequest[] @relation("Follower")
   following  FollowRequest[] @relation("Following")
-
-
 }
 
 model Profile {
@@ -55,7 +53,6 @@ model Post {
   comments  Comment[]
   likeCount Int @default(0)
   likes    Like[]
-
 }
 
 model Comment {

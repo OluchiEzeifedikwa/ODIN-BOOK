@@ -1,130 +1,132 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
-// To render the create post form
-exports.getCreatePost = async (req, res) => {
-  res.render('../odinbook/views/createPost'
-);
-}
+// Render create post form
+const getCreatePost = async (req, res) => {
+  res.render('createPost');
+};
 
 // Create a new post
-exports.createPost = async (req, res, next) => {
+const createPost = async (req, res, next) => {
   try {
     if (!req.user) {
-      return res.status(401).render("../odinbook/views/error", { error: 'You must be logged in to create a post' });
+      return res
+        .status(401)
+        .render('error', {
+          error: 'You must be logged in to create a post',
+        });
     }
 
     const { content } = req.body;
-    const userId = req.user.id;
     const image = req.file ? req.file.filename : null;
 
-    const post = await prisma.post.create({
+    await prisma.post.create({
       data: {
         content,
         image,
-        user: { connect: { id: userId } },
+        userId: req.user.id,
       },
     });
-    console.log(post);
+
     res.redirect('/home');
-    // res.render("../odinbook/views/post", { post });
   } catch (err) {
     next(err);
   }
 };
-
-
-
 
 // Get all posts
-exports.getAllPosts = async (req, res, next) => {
+const getAllPosts = async (req, res, next) => {
   try {
-    const posts = await prisma.post.findMany({
-    where: {
-      OR :[
-        { userId: req.user.id},
-        {
-          user: {                     // relation to the post author
-        followers: {
-          some: {
-            followerId: req.user.id,
-            status: 'accepted'   // only accepted follows
-          }
-        }
-      }
-      
+    if (!req.user) {
+      return res
+        .status(401)
+        .render('error', {
+          error: 'You must be logged in to view posts',
+        });
     }
-    ]
-    },
-    include: {
-      user: true,
-      _count: { select: { likes: true, comments: true } },
-      likes: { where: { userId: req.user.id } }   // ← only th
-    },
-    orderBy: { createdAt: 'desc' }
-  });
 
-  // Add a boolean flag for easy templating
-posts.forEach(p => {
-  p.isLiked = p.likes.length > 0
-  delete p.likes   // optional – we don’t need the whole array anymore
-})
+    const posts = await prisma.post.findMany({
+      where: {
+        OR: [
+          { userId: req.user.id },
+          {
+            user: {
+              followers: {
+                some: {
+                  followerId: req.user.id,
+                  status: 'accepted',
+                },
+              },
+            },
+          },
+        ],
+      },
+      include: {
+        user: true,
+        _count: { select: { likes: true, comments: true } },
+        likes: { where: { userId: req.user.id } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
 
-  console.log(posts);
-  res.render("../odinbook/views/posts", { posts });
+    posts.forEach(post => {
+      post.isLiked = post.likes.length > 0;
+    });
+
+    res.render('posts', { posts });
   } catch (err) {
     next(err);
   }
 };
 
-// Get a post by id
-
-exports.getPostById = async (req, res) => {
+// Get post by ID
+const getPostById = async (req, res, next) => {
   try {
     const { id } = req.params;
+
     const post = await prisma.post.findUnique({
       where: { id },
       include: { comments: true },
     });
-    if (!post) {
-      return res.status(404).render("../odinbook/views/error", { error: 'Post not found' });
-    }
-    res.render("../odinbook/views/post", { post });
-  } catch (err) {
-    console.error(err);
-    res.status(500).render("../odinbook/views/error", { error: 'Failed to retrieve post' });
-  }
-};
-
-
-// Delete a post
-exports.deletePost = async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'You must be logged in to delete a post' });
-    }
-
-    const { id } = req.params;
-    const post = await prisma.post.findUnique({
-      where: { id },
-      include: { user: true },
-    });
 
     if (!post) {
-      return res.status(404).json({ message: 'Post not found' });
+      return res
+        .status(404)
+        .render('error', {
+          error: 'Post not found',
+        });
     }
 
-    if (post.user.id !== req.user.id) {
-      return res.status(403).json({ message: 'You do not have permission to delete this post' });
-    }
-
-    await prisma.post.delete({
-      where: { id },
-    });
-
-    res.redirect("/home");
+    res.render('post', { post });
   } catch (err) {
     next(err);
   }
 };
 
+// Delete a post
+const deletePost = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ message: 'You must be logged in to delete a post' });
+    }
+
+    const { id } = req.params;
+    await prisma.post.delete({ where: { id } });
+
+    res.redirect('/home');
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ✅ DEFAULT EXPORT
+export default {
+  getCreatePost,
+  createPost,
+  getAllPosts,
+  getPostById,
+  deletePost,
+};

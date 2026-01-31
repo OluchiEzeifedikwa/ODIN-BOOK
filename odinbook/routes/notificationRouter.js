@@ -1,10 +1,12 @@
-const notificationRouter = require('express').Router();
-const {
-  getNotifications,
-  markAsRead
-} = require('../controllers/notificationController');
+import { Router } from 'express';
+import notificationController from '../controllers/notificationController.js';
 
-notificationRouter.get('/', getNotifications);
-notificationRouter.post('/notifications/:id/read', markAsRead);
+const notificationRouter = Router();
 
-module.exports = notificationRouter;
+notificationRouter.post('/notifications', notificationController.createNotificationAPI);
+notificationRouter.get('/notifications', notificationController.getNotifications);
+notificationRouter.post('/posts/:postId/like', notificationController.likePostNotification);
+notificationRouter.post('/posts/:postId/comments', notificationController.addComment);
+notificationRouter.post('/users/:userId/follow', notificationController.followUser);
+
+export default notificationRouter;

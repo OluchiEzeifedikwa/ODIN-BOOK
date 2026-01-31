@@ -8,115 +8,122 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
 
+/* Comment button (emoji) */
 .comment-btn {
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1.2rem;   /* adjust size of the emoji */
-}
-.comment-count {
-  margin-left: 2px;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
   color: white;
 }
 
+/* Comment count next to emoji */
+.comment-count {
+  margin-left: 4px;
+  font-size: 1.2rem;
+  color: white;
+}
 
-.hidden { display: none; }
-
+/* Comment form */
 .comment-form {
   margin-top: 0.5rem;
+  padding: 10px;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  display: none; /* hidden initially */
 }
+
 .comment-form textarea {
   width: 100%;
-  min-height: 80px;
-  margin-bottom: 0.4rem;
+  min-height: 70px;
+  padding: 6px;
+  border-radius: 5px;
+  border: none;
+  resize: vertical;
+  margin-bottom: 5px;
+  background-color: #1f1f1f;
+  color: white;
 }
 
+/* Comment form buttons */
+.comment-form button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 5px;
+  margin-right: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.comment-form button:hover {
+  background-color: #2980b9;
+}
+
+/* Like button styling */
 .like-btn {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        }
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+}
 
-
-
+/* Heart icon */
 .heart {
-    color: white; 
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
+  color: white;
+  font-size: 1.5rem;
+  margin-left: 4px;
 }
 
-.like-btn.liked .heart { 
-    color: #e74c3c; 
-} /* red when liked */
-
-.heart::before { 
-    content: "♡"; 
-}   /* default outline */
-
-.like-btn.liked .heart::before { 
-    content: "❤️"; color: #e74c3c; 
+/* Keep red only when liked */
+.like-btn.liked .heart {
+  color: #e74c3c;
 }
 
-        
-        
+/* Default heart outline */
+.heart::before {
+  content: "♡";
+}
+
+/* Filled heart when liked */
+.like-btn.liked .heart::before {
+  content: "❤️";
+  color: #e74c3c;
+}
+
+/* Align like/comment buttons horizontally */
+.post-actions {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
 
 
-
-      </style>
+</style>
 </head>
 
 <body>
-
-      <nav id="dashboard">
-           
-        <h1>Mesh Book</h1>
-          <% if (user) { %>
-          <div style="display: flex; align-items: center;">
-            <img src="/uploads/walls.png" alt="Default Profile Picture" style="margin-right: 10px; width: 30px; height: 30px; border-radius: 50px;">
-            <h1>Welcome, <%= user.username %></h1>
-            </div>
-            <% if (user.profile && user.profile.image) { %>
-              <img src="/uploads/<%= user.profile.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
-            <% } else { %>
-              <% } %>
-          <% } else { %>
-            <p>User</p>
-          <% } %>
-            <
-
-          
-            <!-- navbar.ejs -->
-
-    <ul>
-      <li><a href="/" class="nav-link <%= path === '/' ? 'active' : '' %>"><i class="fa fa-home"></i>Home</a></li>
-      <br>
-      <li><a href="/about" class="nav-link <%= path === '/about' ? 'active' : '' %>"><i class="fa fa-user-friends"></i>Friends</a></li>
-      <br>
-      <li><a href="/contact" class="nav-link <%= path === '/contact' ? 'active' : '' %>"><i class="fa fa-user-cog"></i>Account</a></li>
-    </ul>
-   
-  
-</nav>
-
+    <%- include('partials/navbar') %>
         
         <div class="container">
         <section class="board" id="following">
+            <h1>Recent Notification</h1>
             <a href="/profiles">following</a>
             <form action="/search" method="get">
                 <input style="background-color: #ccc;" name="q" value="<%= term %>" placeholder="Search for users">
                 <button type="submit">Go</button>
-              </form>
-
-              
-              
-
+            </form>
 
         </section>
         
+        <!-- To create a post -->
         <section class="board" id="createpost">
             <form enctype="multipart/form-data" action="/posts" method="post">
                 <label for="">What is the Update?</label>
@@ -126,200 +133,30 @@
                 <button type="submit">Post</button>
             </form>
         </section>
+
         <section class="board" id="showpost">
             <a href="/posts">Show All posts</a>
+            <a href="/profiles">Following</a>
         </section>
         
         <section class="board" id="pictures">
-
-            <% profiles.forEach(p => { %>
-                <% if (p.notifications && p.notifications.length) { %>
-                  <% p.notifications.forEach(n => { %>
-                    <li class="<%= n.read ? 'read' : 'unread' %>">
-                      <% if (n.user) { %>
-                        <%= n.user.name %> mentioned you
-                      <% } else if (n.post) { %>
-                        New post from <%= n.post.user.name %>
-                      <% } else if (n.comment) { %>
-                        <%= n.comment.user.name %> commented
-                      <% } %>
-                      <form method="POST" action="/notifications/<%= n.id %>/read" style="display:inline;">
-                        <button type="submit" class="n-btn" data-post-id="<%= n.id %>">Mark as read</button>
-                      </form>
-                    </li>
-                  <% }) %>
-                <% } else { %>
-                  <li>No new notifications.</li>
-                <% } %>
-              <% }) %>
+           <h1>Recent Notification</h1>
+            <% if (notifications.length) { %>
+                <% notifications.forEach(n => { %>
+                  <li class="<%= n.read ? 'read' : 'unread' %>">
+                    <!-- same markup as before, but using `n` directly -->
+                  </li>
+                <% }) %>
+              <% } else { %>
+                <li>No new notifications.</li>
+              <% } %>
 
 
-            <h2>Recent Notifications</h2>
-            <ul>
-                <% if (typeof notifications !== 'undefined' && notifications.length) { %>
-                    <% notifications.forEach(n => { %>
-                        <li class="<%= n.read ? 'read' : 'unread' %>">
-                            <% if (n.user) { %>
-                                <%= n.user.name %> mentioned you
-                                <% } else if (n.post) { %>
-                                    New post from <%= n.post.user.name %>
-                                    <% } else if (n.comment) { %>
-                                        <%= n.comment.user.name %> commented
-                                        <% } %>
-                                        <form method="POST" action="/notifications/<%= n.id %>/read" style="display:inline; background-color: azure;" >
-                                            <button type="submit" class="n-btn" data-post-id="<%= n.id %>">Mark as read</button>
-                                        </form>
-                                    </li>
-                                    <% }) %>
-                                    <% } else { %>
-                                        <li>No new notifications.</li>
-                                        <% } %>
-                                    </ul>
             
-
-            <% if (profiles && profiles.length > 0) { %>
-                <% profiles.forEach((profile) => { %>
-                    <a href="/profiles/<%= profile.id %>">
-                        <% if (profile) { %>
-                          <% if (profile.image) { %>
-                            <div style="display: flex; align-items: center;">
-                                  <img src="/uploads/<%= profile.image %>" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50px;">
-
-                                  <span>
-                                    <%= profile.user.username %>
-                                  </span>
-                                 
-                            </a>
-
-                            <!-- Send followRequest -->
-                            <% if (profile.user.id !== user.id) { %> 
-                                <button type="button" style="margin-left: 330px;" class="follow-btn" data-user-id="<%= profile.user.id %>" data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
-                                    <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
-                                </button>
-                                
-                            <% } %>
-                                
+           <!-- To display all profiles -->
+           <%- include('partials/profiles', { profiles, user }) %>
 
 
-  
-
-                              </div>
-
-                              <br>
-
-                              
-                              
-                              <!-- Post image and content -->
-                              <% if (profile.user.posts && profile.user.posts.length > 0) { %>
-                              <% profile.user.posts.forEach((post) => { %>
-                                <div>
-                                    
-                                    
-                            
-
-                                    
-
-                                
-                                    <% if (post.image) { %>
-                                        <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
-                                        <% } %>
-                                        <p>
-                                           
-                                            <%= post.content %>
-                                            <span style="font-size: small; color: grey;">
-                                            <%= minutesAgo(post.createdAt) %>
-                                            </span>
-                                        </p>
-                                        
-                                        <!-- <a href=""><i class="fa fa-send"></i></a> -->
-                                </div>
-
-
-                              
-                                    <% if (user && post.userId === user.id) { %>
-                                        <form action="/posts/delete/<%= post.id %>" method="post">
-                                            <input type="hidden" name="_method" value="DELETE">
-                                          <button type="submit">Delete Post</button>
-                                        </form>
-                                    <% } %>
-                                    
-                              
-
-
-                                       <!-- like button -->
-                                        <button style="font-size: medium;" class="like-btn" <%= post.isLiked ? 'liked' : '' %>"
-                                             data-post-id="<%= post.id %>" style="background-color: black;">
-                                            <span style="font-size: medium;" class="heart"><%= post.likeCount %></span>
-                                        </button>
-
-                                        <!-- 1️⃣ Button that triggers the form -->
-                                         <button style="font-size: medium;" class="comment-btn" data-post-id="<%= post.id %>">
-                                            💬<span style="font-size: medium;" class="comment-count"><%= post._count.comments %></span>
-                                        </button>
-
-                                          <div class="comments-panel" data-post-id="<%= post.id %>" style="display:none;">
-                                            <ul class="comments-list"></ul>
-                                        </div>
-
-
-
-
-                                 <!-- The form that will be rendered once the comment button is clicked -->
-                                <form class="comment-form" data-post-id="<%= post.id %>" method="POST" action="/posts/<%= post.id %>/comments" style="display:none;">
-                                    <% if (post.comments && post.comments.length) { %>
-                                        <% post.comments.forEach(comment => { %>
-                                            <p style="color: yellow;">
-                                                <img src="/uploads/<%= profile.image %>" alt="Post Image" style="width: 50px; height: 50px; border-radius: 50px;">
-                                                <%= comment.user.username %> 
-                                                <span style="font-size: small; color: white;">
-                                                    <%= minutesAgo(comment.createdAt) %>
-                                                </span>
-                                            </p>
-                                            <p><%= comment.content %></p>
-                                        <% }) %>
-                                      <% } else { %>
-                                        <p>No comments yet.</p>
-                                      <% } %>
-                                      
-                                    <% if (user && user.image) { %>
-                                        <img src="/uploads/<%= user.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
-                                      <% } %>
-                                    <input type="hidden" name="postId" value="<%= post.id %>">
-                                    <textarea name="content" placeholder="Write a comment…" required></textarea>
-                                      
-
-                                      
-                                    <button type="submit">Post</button>
-                                    <button type="button" class="cancel-btn">Cancel</button>
-                                </form>
-                                
-                                       
-                                
-
-
-                                   
-                                      <% console.log(post); %>
-
-                                  
-                                    <% }); %>
-                                    <% } else { %>
-                                        <p>No posts available</p>
-                                        <% } %>
-                                        <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;"></div>
-
-                                        <% } else { %>
-                                            <p>No profile picture available</p>
-                                            <% } %>
-                                            <% } else { %>
-                                                <p>No profile information available</p>
-                                                <% } %>
-                                            </a>
-                                            <% }); %>
-                                            <% } %>
-    </section>
-        
-        
-        
         <div class="search-container">
             <input type="search" id="search-input" placeholder="Search...">
             <button type="submit" id="search-button">
@@ -328,9 +165,10 @@
         </div>
     </div>
 
+    
+      
+
 <script>
-
-
 // To display the comment form    
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', async e => {
@@ -338,50 +176,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.classList.contains('comment-btn')) {
       const postId = e.target.dataset.postId;
       const form = document.querySelector(`.comment-form[data-post-id="${postId}"]`);
-      if (form) form.style.display = 'block';
-
-      // Load existing comments (only once)
-      const panel = document.querySelector(`.comments-panel[data-post-id="${postId}"]`);
-      const list = panel.querySelector('.comments-list');
-      if (!list.dataset.loaded) {
-        const resp = await fetch(`/home/${postId}/comments`);
-        const comments = await resp.json();
-        list.innerHTML = comments.map(c => `
-          <li><strong>${c.author.name}:</strong> ${c.content}</li>
-        `).join('');
-        list.dataset.loaded = 'true';
-      }
-      panel.style.display = 'block';
+      if (form) form.style.display = 'block';  
     }
 
     // 2️⃣ Hide the form
     if (e.target.classList.contains('cancel-btn')) {
       const form = e.target.closest('.comment-form');
       if (form) form.style.display = 'none';
-    }
-
-    // 3️⃣ Submit a new comment (AJAX)
-    if (e.target.classList.contains('submit-btn')) {
-      const postId = e.target.dataset.postId;
-      const textarea = document.querySelector(`.comment-form[data-post-id="${postId}"] textarea`);
-      const content = textarea.value.trim();
-
-      if (!content) return;
-
-      const resp = await fetch(`/home/${postId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content })
-      });
-      const newComment = await resp.json();
-
-      // Append the comment instantly
-      const list = document.querySelector(`.comments-panel[data-post-id="${postId}"] .comments-list`);
-      list.insertAdjacentHTML('beforeend', `
-        <li><strong>${newComment.author.name}:</strong> ${newComment.content}</li>
-      `);
-      textarea.value = ''; // clear input
-    }
+    } 
   });
 }); 
 
@@ -404,31 +206,10 @@ document.body.addEventListener('click', async e => {
 
     btn.classList.toggle('liked');
     btn.querySelector('.heart').textContent = `${data.likes}`;
-
-  } catch (err) {
+} catch (err) {
     console.error(err);
   }
-  // after the like state updates, fetch the likers list
-  const likersResp = await fetch(`/posts/${postId}/likers`);
-  const likers = await likersResp.json(); // [{id,1, name:'Ada'}, …]
-
-  // simple example: dump the names into a modal
-  const modal = document.createElement('div');
-  modal.className = 'likers-modal';
-  modal.innerHTML = `
-    <h4>Liked by</h4>
-    <ul>${likers.map(u => `<li>${u.name}</li>`).join('')}</ul>
-    <button class="close">×</button>
-  `;
-  document.body.appendChild(modal);
-
-  modal.querySelector('.close').addEventListener('click', () => {
-    modal.remove();
 });
-
-});
-
-
 
 // To follow a user
 document.addEventListener('click', e => {

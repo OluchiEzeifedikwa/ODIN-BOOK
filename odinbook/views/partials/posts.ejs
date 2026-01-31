@@ -1,0 +1,82 @@
+<% if (posts && posts.length > 0) { %>
+    <% posts.forEach((post) => { %>
+      <div>
+        <% if (post.image) { %>
+          <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
+        <% } %>
+        <p>
+          <%= post.content %>
+          <span style="font-size: small; color: grey;">
+            <%= minutesAgo(post.createdAt) %>
+          </span>
+        </p>
+  
+        <% if (user && post.userId === user.id) { %>
+          <form action="/posts/delete/<%= post.id %>" method="post">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit">Delete Post</button>
+          </form>
+        <% } %>
+  
+        <!-- Like button -->
+        <button style="font-size: medium;" class="like-btn <%= post.isLiked ? 'liked' : '' %>" data-post-id="<%= post.id %>">
+          <span class="heart"><%= post.likeCount %></span>
+        </button>
+  
+        <!-- Comment button -->
+        <button style="font-size: medium;" class="comment-btn" data-post-id="<%= post.id %>">
+          💬<span class="comment-count"><%= post._count.comments %></span>
+        </button>
+  
+        <!-- Comment form (hidden initially) -->
+        <form class="comment-form" data-post-id="<%= post.id %>" method="POST" action="/posts/<%= post.id %>/comments" style="display:none;">
+          <% if (post.comments && post.comments.length > 0 ) { %>
+            <% post.comments.forEach(comment => { %>
+              <p style="color: yellow;">
+                <img src="/uploads/<%= comment.user.image %>" alt="Profile Image" style="width: 50px; height: 50px; border-radius: 50px;">
+                <%= comment.user.username %> 
+                <span style="font-size: small; color: white;">
+                  <%= minutesAgo(comment.createdAt) %>
+                </span>
+              </p>
+              <p><%= comment.content %></p>
+            <% }) %>
+          <% } else { %>
+            <p>No comments yet.</p>
+          <% } %>
+  
+          <% if (user && user.image) { %>
+            <img src="/uploads/<%= user.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
+          <% } %>
+  
+          <input type="hidden" name="postId" value="<%= post.id %>">
+          <textarea name="content" placeholder="Write a comment…" required></textarea>
+          <button type="submit" class="submit-btn">Post</button>
+          <button type="button" class="cancel-btn">Cancel</button>
+        </form>
+      </div>
+      <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;"></div>
+    <% }); %>
+  <% } else { %>
+    <p>No posts available</p>
+  <% } %>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  

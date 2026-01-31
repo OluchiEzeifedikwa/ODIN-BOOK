@@ -1,106 +1,96 @@
-const express = require('express');
-const session = require('express-session');
-const passport = require('./passport');
-const path = require("node:path");
-const methodOverride = require('method-override');
+import express from "express";
+import session from "express-session";
+import passport from "./passport.js";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import methodOverride from "method-override";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+import flash from "connect-flash";
+import multer from "multer";
+
+import authSignup from "./auth/routes/signupRouter.js";
+import authLogin from "./auth/routes/loginRouter.js";
+import postRouter from "./odinbook/routes/postRouter.js";
+import commentRouter from "./odinbook/routes/commentRouter.js";
+import homeRouter from "./odinbook/routes/homeRouter.js";
+import profileRouter from "./odinbook/routes/profileRouter.js";
+import likeRouter from "./odinbook/routes/likeRouter.js";
+import followRequestRouter from "./odinbook/routes/followRequestRouter.js";
+import notificationRouter from "./odinbook/routes/notificationRouter.js";
+import errorHandler from "./odinbook/middleware/errorHandler.js";
+import upload from "./upload.js";
+
+
+
 const app = express();
-const jwt = require('jsonwebtoken');
-const authSignup = require('./auth/routes/signupRouter');
-const authLogin = require('./auth/routes/loginRouter');
-const postRouter = require('./odinbook/routes/postRouter');
-const commentRouter = require('./odinbook/routes/commentRouter');
-const homeRouter = require('./odinbook/routes/homeRouter');
-const profileRouter = require('./odinbook/routes/profileRouter');
-const likeRouter = require('./odinbook/routes/likeRouter');
-const followRequestRouter = require('./odinbook/routes/followRequestRouter');
-const errorHandler = require('./odinbook/middleware/errorHandler');
-const cookieParser = require('cookie-parser');
-const flash = require('connect-flash');
-const multer = require('multer');
-const upload = require('./upload');
+
+/* ---------------- ES module __dirname replacement ---------------- */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* ---------------- Static & views ---------------- */
+
+// Serve static files from public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve uploaded files from /uploads route
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.set("views", [
+  path.join(__dirname, "odinbook", "views"),
+  path.join(__dirname, "auth", "views"),
+]);
 
 
-
-const assetsPath = path.join(__dirname, "views");
-
-
-app.use(express.static(assetsPath));
-// Serve static files from the 'public' directory
-app.use(express.static('public'));
-console.log(assetsPath);
-
-app.use(express.static('uploads'));
-
-app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+
+/* ---------------- Middleware ---------------- */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(
   session({
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
-  }),
+  })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
-app.use("/uploads", express.static("uploads"));
+app.use(cookieParser());
+app.use(flash());
+app.use(methodOverride("_method"));
+
+/* ---------------- Routes ---------------- */
 app.use(authLogin);
 app.use(authSignup);
-app.use(flash());
 app.use(profileRouter);
 app.use(commentRouter);
 app.use(postRouter);
 app.use(homeRouter);
 app.use(likeRouter);
 app.use(followRequestRouter);
-app.use(methodOverride('_method'));
+app.use(notificationRouter);
 
+/* ---------------- Error handling ---------------- */
+app.use(errorHandler);
 
-
-app.use((err, req, res, next) => {
-  console.error(err); // Log the error
-  const statusCode = err.statusCode || 500;
-  const error = statusCode === 404 ? err.message : 'An internal server error occurred';
-  
-  if (statusCode === 404) {
-    res.status(statusCode).render("../odinbook/views/error", { error });
-  }
+/* ---------------- Test error route ---------------- */
+app.get("/error", (req, res) => {
+  throw new Error("Something went wrong");
 });
 
-app.get('/error', (req, res) => {
-  throw new Error('Something went wrong')
-})
+console.log("Running from:", process.cwd());
 
-app.get('/posts/:id', async (req, res) => {
-  const postId = req.params.id;
-  try {
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      include: {
-        likes: true,
-      },
-    });
-    res.render('post', { post });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching post');
-  }
+app.get("/test", (req, res) => {
+  res.render("index");
 });
 
-
-
-
-app.use(cookieParser);
-
-
-
-
-
+/* ---------------- Server ---------------- */
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server listening at ${PORT}`)
-})
-
-
-
+console.log(PORT);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server listening at ${PORT}`);
+});

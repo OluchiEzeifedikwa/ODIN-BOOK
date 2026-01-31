@@ -1,5 +1,4 @@
-// helpers/timeAgo.js
-module.exports = function (date) {
+export default function timeAgo(date) {
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
     if (seconds < 60) return `${seconds} second${seconds !== 1 ? 's' : ''} ago`;
   
@@ -17,4 +16,5 @@ module.exports = function (date) {
   
     const years = Math.floor(months / 12);
     return `${years} year${years !== 1 ? 's' : ''} ago`;
-  };
+  }
+  

@@ -1,0 +1,29 @@
+<% if (profiles && profiles.length > 0) { %>
+    <% profiles.forEach((profile) => { %>
+      <% if (profile) { %>
+        <% if (profile.image) { %>
+          <a href="/profiles/<%= profile.id %>">
+            <div style="display: flex; align-items: center;">
+              <img src="/uploads/<%= profile.image %>" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50px;">
+              <span><%= profile.user.username %></span>
+              
+              <% if (profile.user.id !== user.id) { %>
+                <button type="button" style="margin-left: 330px;" class="follow-btn" data-user-id="<%= profile.user.id %>" data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
+                  <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
+                </button>   
+              <% } %>
+            </div>
+          </a>
+  
+          <!-- Include posts partial -->
+          <%- include('partials/posts', { posts: profile.user.posts, user: user }) %>
+  
+        <% } else { %>
+          <p>No profile picture available</p>
+        <% } %>
+      <% } else { %>
+        <p>No profile information available</p>
+      <% } %>
+    <% }); %>
+  <% } %>
+  

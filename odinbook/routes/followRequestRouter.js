@@ -1,25 +1,19 @@
-const express = require('express')
-const followRequestRouter = express.Router()
-const {
-  sendFollowRequest,
-  sendUnfollowRequest,
-  getFollowRequests,
-  acceptFollowRequest,
-  rejectFollowRequest,
-} = require('../controllers/followRequestController')
+import express from 'express';
+import followRequestController from '../controllers/followRequestController.js';
+
+const followRequestRouter = express.Router();
 
 // Send a follow request
-followRequestRouter.post('/users/follow/:receiverId', sendFollowRequest)
+followRequestRouter.post('/users/follow/:receiverId', followRequestController.sendFollowRequest);
 
-// Send an Unfollow request
-followRequestRouter.post('/users/unfollow/:receiverId', sendUnfollowRequest);
+// Send an unfollow request
+followRequestRouter.post('/users/unfollow/:receiverId', followRequestController.sendUnfollowRequest);
 
 // List pending requests for a user
-followRequestRouter.get('/follow/requests/:userId', getFollowRequests)
+followRequestRouter.get('/follow/requests/:userId', followRequestController.getFollowRequests);
 
 // Accept / reject a request
-followRequestRouter.post('/follow/requests/:requestId/accept', acceptFollowRequest)
-followRequestRouter.post('/follow/requests/:requestId/reject', rejectFollowRequest)
+followRequestRouter.post('/follow/requests/:requestId/accept', followRequestController.acceptFollowRequest);
+followRequestRouter.post('/follow/requests/:requestId/reject', followRequestController.rejectFollowRequest);
 
-
-module.exports = followRequestRouter
+export default followRequestRouter;

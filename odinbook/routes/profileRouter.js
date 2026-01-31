@@ -1,12 +1,13 @@
-const { Router } = require('express');
+import { Router } from 'express';
+import profileController from '../controllers/profileController.js';
+import { PrismaClient } from '@prisma/client';
+import path from 'path';
+import multer from 'multer';
+
 const profileRouter = Router();
-const profileController = require('../controllers/profileController');
-const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const path = require("path");
-const multer = require('multer');
 
-
+// Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -16,15 +17,12 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-
+// Routes
 profileRouter.get('/editProfile/:id', profileController.getEditProfileForm);
 profileRouter.get('/profiles', profileController.getProfiles);
 profileRouter.get('/profiles/:id', profileController.getProfileById);
 profileRouter.post('/profiles/:id', upload.single('profileImage'), profileController.updateProfile);
 
-
-module.exports = profileRouter;
-
-
+export default profileRouter;
