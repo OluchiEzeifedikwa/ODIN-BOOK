@@ -1,10 +1,15 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
+import dotenv from "dotenv";
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
+
+// Load environment variables
+dotenv.config();
 
 /* =========================
    Local Strategy
@@ -68,7 +73,9 @@ passport.use(
   new JWTStrategy(
     {
       jwtFromRequest: cookieExtractor,
-      secretOrKey: process.env.SECRET_KEY,
+      
+      secretOrKey: process.env.JWT_SECRET, // must exist
+
     },
     async (jwtPayload, done) => {
       try {

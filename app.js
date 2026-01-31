@@ -8,7 +8,6 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import flash from "connect-flash";
 import multer from "multer";
-
 import authSignup from "./auth/routes/signupRouter.js";
 import authLogin from "./auth/routes/loginRouter.js";
 import postRouter from "./odinbook/routes/postRouter.js";
@@ -20,6 +19,8 @@ import followRequestRouter from "./odinbook/routes/followRequestRouter.js";
 import notificationRouter from "./odinbook/routes/notificationRouter.js";
 import errorHandler from "./odinbook/middleware/errorHandler.js";
 import upload from "./upload.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 
 
@@ -51,7 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
-    secret: process.env.SECRET_KEY,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
   })
