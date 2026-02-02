@@ -11,6 +11,12 @@ jobs:
   build:
     runs-on: ubuntu-latest     # virtual environment
 
+    env:
+    JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+    DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+
     strategy:
       matrix:
         node-version: [18.x]   # use Node 18
