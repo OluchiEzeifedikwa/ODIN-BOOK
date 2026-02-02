@@ -1,40 +1,26 @@
 name: Node.js CI
 
-# When to run the workflow
 on:
   push:
-    branches: [ "main" ]      # run on push to main
+    branches: [main]
   pull_request:
-    branches: [ "main" ]      # run on PR to main
+    branches: [main]
 
 jobs:
   build:
-    runs-on: ubuntu-latest     # virtual environment
+    runs-on: ubuntu-latest
 
     env:
-    JWT_SECRET: ${{ secrets.JWT_SECRET }}
-    SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-    DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
-
-    strategy:
-      matrix:
-        node-version: [18.x]   # use Node 18
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-
-      # - name: Run Tests (optional)
-      #   run: npm test
-
-      - name: Start the App (optional for dev)
-        run: npm run dev
+      - run: npm install
+      - run: npx prisma generate
