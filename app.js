@@ -19,6 +19,7 @@ import followRequestRouter from "./odinbook/routes/followRequestRouter.js";
 import notificationRouter from "./odinbook/routes/notificationRouter.js";
 import errorHandler from "./odinbook/middleware/errorHandler.js";
 import upload from "./upload.js";
+import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -74,6 +75,14 @@ app.use(homeRouter);
 app.use(likeRouter);
 app.use(followRequestRouter);
 app.use(notificationRouter);
+
+app.use(
+  cors({
+    origin: "http://localhost:3000", // front-end URL
+    credentials: true,               // allow cookies
+  })
+);
+
 
 /* ---------------- Error handling ---------------- */
 app.use(errorHandler);
