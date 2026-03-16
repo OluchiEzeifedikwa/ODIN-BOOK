@@ -13,7 +13,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-console.log('postController:', postController);
 
 // Routes
 postRouter.get('/createPost', postController.getCreatePost);

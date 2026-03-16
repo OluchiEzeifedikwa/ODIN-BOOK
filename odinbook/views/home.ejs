@@ -95,7 +95,6 @@
 /* Filled heart when liked */
 .like-btn.liked .heart::before {
   content: "❤️";
-  color: #e74c3c;
 }
 
 /* Align like/comment buttons horizontally */
@@ -106,69 +105,69 @@
 }
 
 
+
 </style>
 </head>
 
 <body>
-    <%- include('partials/navbar') %>
-        
-        <div class="container">
+
+  <button id="menu-toggle">☰</button>
+  
+  <div class="layout">
+  
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <h2>Mesh Book</h2>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/add-book">Add Book</a></li>
+        <li><a href="/profile">Profile</a></li>
+      </ul>
+    </nav>
+  
+    <!-- Main Content -->
+    <main class="main-content">
+  
+
+  
+      <div class="container">
+  
         <section class="board" id="following">
-            <h1>Recent Notification</h1>
-            <a href="/profiles">following</a>
-            <form action="/search" method="get">
-                <input style="background-color: #ccc;" name="q" value="<%= term %>" placeholder="Search for users">
-                <button type="submit">Go</button>
-            </form>
-
+          <a href="/profiles">Following</a>
         </section>
-        
-        <!-- To create a post -->
-        <section class="board" id="createpost">
-            <form enctype="multipart/form-data" action="/posts" method="post">
-                <label for="">What is the Update?</label>
-                <input type="file" name="postImage" accept="image/*">
-                <label for="content">Content</label>
-                <input type="text" id="content" name="content" required>
-                <button type="submit">Post</button>
-            </form>
-        </section>
-
+  
+        <section class="board" id="createpost"></section>
+  
         <section class="board" id="showpost">
-            <a href="/posts">Show All posts</a>
-            <a href="/profiles">Following</a>
+          <a href="/posts">Show All Posts</a>
+          <a href="/profiles">Following</a>
         </section>
-        
+  
         <section class="board" id="pictures">
-           <h1>Recent Notification</h1>
-            <% if (notifications.length) { %>
-                <% notifications.forEach(n => { %>
-                  <li class="<%= n.read ? 'read' : 'unread' %>">
-                    <!-- same markup as before, but using `n` directly -->
-                  </li>
-                <% }) %>
-              <% } else { %>
-                <li>No new notifications.</li>
-              <% } %>
-
-
-            
-           <!-- To display all profiles -->
-           <%- include('partials/profiles', { profiles, user }) %>
-
-
+          <%- include('partials/profiles', { profiles, user }) %>
+        </section>
+  
         <div class="search-container">
-            <input type="search" id="search-input" placeholder="Search...">
-            <button type="submit" id="search-button">
-                <i class="fa fa-search"></i>
-            </button> 
+          <input type="search" id="search-input" placeholder="Search...">
+          <button type="submit" id="search-button">
+            <i class="fa fa-search"></i>
+          </button>
         </div>
-    </div>
-
-    
-      
+  
+      </div>
+  
+    </main>
+  
+  </div>
 
 <script>
+
+const toggle = document.getElementById("menu-toggle");
+const sidebar = document.querySelector(".sidebar");
+
+toggle.addEventListener("click", () => {
+  sidebar.classList.toggle("active");
+});
 // To display the comment form    
 document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', async e => {

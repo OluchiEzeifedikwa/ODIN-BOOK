@@ -1,82 +1,54 @@
-<% if (posts && posts.length > 0) { %>
-    <% posts.forEach((post) => { %>
-      <div>
-        <% if (post.image) { %>
-          <img src="/uploads/<%= post.image %>" alt="Post Image" style="width: 500px; height: 500px;">
-        <% } %>
-        <p>
-          <%= post.content %>
-          <span style="font-size: small; color: grey;">
-            <%= minutesAgo(post.createdAt) %>
-          </span>
-        </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="post-body">
+
+  <div class="post-page">
   
-        <% if (user && post.userId === user.id) { %>
-          <form action="/posts/delete/<%= post.id %>" method="post">
-            <input type="hidden" name="_method" value="DELETE">
-            <button type="submit">Delete Post</button>
-          </form>
-        <% } %>
+    <div class="post-card">
   
-        <!-- Like button -->
-        <button style="font-size: medium;" class="like-btn <%= post.isLiked ? 'liked' : '' %>" data-post-id="<%= post.id %>">
-          <span class="heart"><%= post.likeCount %></span>
-        </button>
+      <h1 class="post-header">Your Post</h1>
   
-        <!-- Comment button -->
-        <button style="font-size: medium;" class="comment-btn" data-post-id="<%= post.id %>">
-          💬<span class="comment-count"><%= post._count.comments %></span>
-        </button>
+      <p class="post-text"><%= post.content %></p>
   
-        <!-- Comment form (hidden initially) -->
-        <form class="comment-form" data-post-id="<%= post.id %>" method="POST" action="/posts/<%= post.id %>/comments" style="display:none;">
-          <% if (post.comments && post.comments.length > 0 ) { %>
-            <% post.comments.forEach(comment => { %>
-              <p style="color: yellow;">
-                <img src="/uploads/<%= comment.user.image %>" alt="Profile Image" style="width: 50px; height: 50px; border-radius: 50px;">
-                <%= comment.user.username %> 
-                <span style="font-size: small; color: white;">
-                  <%= minutesAgo(comment.createdAt) %>
-                </span>
-              </p>
-              <p><%= comment.content %></p>
-            <% }) %>
-          <% } else { %>
-            <p>No comments yet.</p>
-          <% } %>
+      <% if(post.image){ %>
+        <img class="post-image" src="/uploads/<%= post.image %>" alt="post image">
+      <% } %>
   
-          <% if (user && user.image) { %>
-            <img src="/uploads/<%= user.image %>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50px;">
-          <% } %>
-  
-          <input type="hidden" name="postId" value="<%= post.id %>">
-          <textarea name="content" placeholder="Write a comment…" required></textarea>
-          <button type="submit" class="submit-btn">Post</button>
-          <button type="button" class="cancel-btn">Cancel</button>
-        </form>
+      <div class="post-icons">
+        <a href="#"><i class="fa fa-heart-o"></i></a>
+        <a href="#"><i class="fa fa-comment-o"></i></a>
+        <a href="#"><i class="fa fa-bookmark-o"></i></a>
+        <a href="#"><i class="fa fa-send-o"></i></a>
       </div>
-      <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px;"></div>
-    <% }); %>
-  <% } else { %>
-    <p>No posts available</p>
-  <% } %>
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      <form class="comment-form" action="/posts/<%= post.id %>/comments" method="post">
+        <input type="hidden" name="postId" value="<%= post.id %>">
   
+        <input 
+          type="text" 
+          name="content" 
+          placeholder="Write a comment..."
+          class="comment-input"
+        >
+  
+        <button type="submit" class="comment-submit">
+          Submit
+        </button>
+      </form>
+  
+    </div>
+  
+  </div>
+  
+  </body>
+
+</body>
+</html>

@@ -21,7 +21,7 @@ const upload = multer({ storage });
 
 // Routes
 profileRouter.get('/editProfile/:id', profileController.getEditProfileForm);
-profileRouter.get('/profiles', profileController.getProfiles);
+profileRouter.get('/profiles', profileController.getProfilesPage);
 profileRouter.get('/profiles/:id', profileController.getProfileById);
 profileRouter.post('/profiles/:id', upload.single('profileImage'), profileController.updateProfile);
 

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { createNotification } from './notificationController.js';
 
 const prisma = new PrismaClient();
 
@@ -21,26 +22,19 @@ const likePost = async (req, res, next) => {
       return res.status(400).json({ message: 'You have already liked this post' });
     }
 
-    // Create like
     const like = await prisma.like.create({
       data: { postId, userId },
     });
 
-    if (!like) {
-      return res.status(400).json({ message: 'Failed to create like' });
+    const likeCount = await prisma.like.count({ where: { postId } });
+
+    // Notify the post owner (skip if they liked their own post)
+    const post = await prisma.post.findUnique({ where: { id: postId }, select: { userId: true } });
+    if (post && post.userId !== userId) {
+      await createNotification({ userId: post.userId, type: 'like', likeId: like.id });
     }
 
-    // Increment post likeCount
-    const updatedPost = await prisma.post.update({
-      where: { id: postId },
-      data: { likeCount: { increment: 1 } },
-    });
-
-    if (!updatedPost) {
-      return res.status(400).json({ message: 'Failed to update post like count' });
-    }
-
-    res.json({ likes: updatedPost.likeCount });
+    res.json({ likes: likeCount });
   } catch (err) {
     next(err);
   }
@@ -56,7 +50,6 @@ const unlikePost = async (req, res, next) => {
     const { postId } = req.params;
     const userId = req.user.id;
 
-    // Delete the like
     const deleted = await prisma.like.deleteMany({
       where: { AND: [{ postId }, { userId }] },
     });
@@ -65,13 +58,8 @@ const unlikePost = async (req, res, next) => {
       return res.status(400).json({ message: "You haven't liked this post" });
     }
 
-    // Decrement post likeCount
-    const updatedPost = await prisma.post.update({
-      where: { id: postId },
-      data: { likeCount: { decrement: 1 } },
-    });
-
-    res.json({ likes: updatedPost.likeCount });
+    const likeCount = await prisma.like.count({ where: { postId } });
+    res.json({ likes: likeCount });
   } catch (err) {
     next(err);
   }

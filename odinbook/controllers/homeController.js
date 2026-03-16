@@ -3,26 +3,6 @@ import minutesAgo from '../helpers/minutesAgo.js';
 
 const prisma = new PrismaClient();
 
-// Render the editProfile form
-const getEditProfileForm = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const profile = await prisma.profile.findUnique({
-      where: { id },
-      include: { user: true },
-    });
-
-    if (!profile) {
-      return res.status(404).send('Profile not found');
-    }
-
-    res.render('editProfile', { profile });
-  } catch (err) {
-    console.error(err);
-    next(err);
-  }
-};
-
 // Render the home page
 const getHomePage = async (req, res, next) => {
   try {
@@ -36,7 +16,12 @@ const getHomePage = async (req, res, next) => {
             posts: {
               include: {
                 _count: { select: { likes: true, comments: true } },
-                comments: { include: { user: true } },
+                comments: {
+                  include: {
+                    user: { include: { profile: true } },
+                  },
+                },
+                likes: { where: { userId: req.user.id } },
               },
             },
             notifications: {
@@ -54,9 +39,19 @@ const getHomePage = async (req, res, next) => {
       },
     });
 
-    // Add isFollowing flag
+    // Build a set of user IDs the current user is following
+    const followingRecords = await prisma.followRequest.findMany({
+      where: { followerId: req.user.id, status: 'accepted' },
+      select: { followingId: true },
+    });
+    const followingSet = new Set(followingRecords.map(f => f.followingId));
+
+    // Add isFollowing flag + isLiked flag per post
     for (const profile of profiles) {
-      profile.isFollowing = true;
+      profile.isFollowing = followingSet.has(profile.user.id);
+      for (const post of profile.user.posts) {
+        post.isLiked = post.likes.length > 0;
+      }
     }
 
     // Current user's notifications
@@ -72,7 +67,8 @@ const getHomePage = async (req, res, next) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    res.render('home', {
+    res.render('pages/home', {
+      title: "Home",
       profiles,
       notifications,
       user: req.user,
@@ -85,63 +81,7 @@ const getHomePage = async (req, res, next) => {
   }
 };
 
-// Get profile by ID
-const getProfileById = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    console.log(`Fetching profile with ID: ${id}`);
-
-    const profile = await prisma.profile.findUnique({
-      where: { id },
-      include: { user: true },
-    });
-
-    if (!profile) {
-      const error = new Error('Profile not found');
-      error.statusCode = 404;
-      throw error;
-    }
-
-    res.render('home', { profile });
-  } catch (err) {
-    console.error(err);
-    next(err);
-  }
-};
-
-// Update profile
-const updateProfile = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { bio, location, pronoun } = req.body;
-
-    // Fetch existing profile first
-    const profile = await prisma.profile.findUnique({ where: { id } });
-    if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
-    }
-
-    await prisma.profile.update({
-      where: { id },
-      data: {
-        bio,
-        location,
-        pronoun,
-        image: req.file ? req.file.filename : profile.image,
-      },
-    });
-
-    console.log('Profile update request received!', req.body);
-
-    res.status(200).json({ message: 'Profile updated successfully' });
-  } catch (err) {
-    next(err);
-  }
-};
 
 export default {
-  getEditProfileForm,
   getHomePage,
-  getProfileById,
-  updateProfile,
 };

@@ -38,9 +38,6 @@ const login = (req, res, next) => {
         path: '/',
       });
 
-      console.log('JWT:', token);
-      console.log('Cookie set:', res.getHeaders()['set-cookie']);
-
       return res.redirect('/home');
     });
   })(req, res, next);

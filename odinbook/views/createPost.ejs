@@ -1,21 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body class="createpost-body">
-        <h1 class='header'>CREATE POSTS</h1>
-        <form enctype="multipart/form-data" action="/posts" method="post">
-          <input type="file" name="postImage" accept="image/*">
-          <label for="content">Content</label>
-          <input type="text" id="content" name="content">
-          <button type="submit">Post</button>
-        </form>
-    </div>
-  </div>
-</body>
-</html>
+<div class="createpost-body">
 
+  <h1 class="header">Create Post</h1>
+
+  <form class="createpost-card" enctype="multipart/form-data" action="/posts" method="post">
+    <div>
+      <label for="postImage">Image (optional)</label>
+      <input type="file" id="postImage" name="postImage" accept="image/*">
+    </div>
+
+    <div>
+      <label for="content">What's on your mind?</label>
+      <input type="text" id="content" name="content" placeholder="Write something..." required>
+    </div>
+
+    <button type="submit">Post</button>
+  </form>
+
+</div>

@@ -36,7 +36,6 @@ model Profile {
   image      String?
   userId     String   @unique
   user       User     @relation(fields: [userId], references: [id])
-  notifications Notification[] // reverse side for Notification.post
   createdAt  DateTime @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -96,27 +95,24 @@ model FollowRequest {
 
 model Notification {
   id              Int              @id @default(autoincrement())
-  type            String           // "like", "followRequest", "comment", "post"
+  type            String           // "like", "comment", "follow"
   read            Boolean          @default(false)
-  profile         Profile?   @relation(fields: [profileId], references: [id])
-  profileId       String?      @unique
-
 
   // Target user (the recipient)
-  userId          String?  @unique
-  user            User?             @relation(fields: [userId], references: [id])
+  userId          String
+  user            User             @relation(fields: [userId], references: [id])
 
   // Optional polymorphic links – only one will be set per notification
-  postId          String?                @unique
-  post            Post?                  @relation(fields: [postId], references: [id])
+  postId          String?
+  post            Post?            @relation(fields: [postId], references: [id])
 
-  commentId       String?          @unique   
+  commentId       String?
   comment         Comment?         @relation(fields: [commentId], references: [id])
 
-  likeId          String?          @unique
+  likeId          String?
   like            Like?            @relation(fields: [likeId], references: [id])
 
-  followRequestId String?          @unique
+  followRequestId String?
   followRequest   FollowRequest?   @relation(fields: [followRequestId], references: [id])
 
   createdAt       DateTime         @default(now())

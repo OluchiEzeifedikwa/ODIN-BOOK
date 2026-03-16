@@ -1,23 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head><title>Your Notifications</title></head>
-<body>
-  <h1>Notifications</h1>
-  <ul>
-    <% notifications.forEach(n => { %>
-      <li class="<%= n.read ? 'read' : 'unread' %>">
-        <% if (n.user) { %>
-          <%= n.user.name %> mentioned you
-        <% } else if (n.post) { %>
-          New post from <%= n.post.user.name %>
-        <% } else if (n.comment) { %>
-          <%= n.comment.author.name %> commented
-        <% } %>
-        <form method="POST" action="/notifications/<%= n.id %>/read" style="display:inline;">
-          <button type="submit">Mark as read</button>
+<main class="main-content">
+  <div class="notifications-page">
+    <div class="notifications-header">
+      <h2>Notifications</h2>
+      <% if (notifications.length > 0) { %>
+        <form action="/notifications/read-all" method="POST">
+          <button type="submit" class="mark-read-btn">Mark all as read</button>
         </form>
-      </li>
-    <% }) %>
-  </ul>
-</body>
-</html>
+      <% } %>
+    </div>
+
+    <% if (notifications.length === 0) { %>
+      <p class="no-notifs">You have no notifications yet.</p>
+    <% } else { %>
+      <ul class="notif-list">
+        <% notifications.forEach(n => { %>
+          <li class="notif-item <%= n.read ? 'read' : 'unread' %>">
+            <div class="notif-icon">
+              <% if (n.type === 'like') { %>
+                <i class="fa-solid fa-heart" style="color:#ef4444;"></i>
+              <% } else if (n.type === 'comment') { %>
+                <i class="fa-solid fa-comment" style="color:#38bdf8;"></i>
+              <% } else if (n.type === 'follow') { %>
+                <i class="fa-solid fa-user-plus" style="color:#34d399;"></i>
+              <% } %>
+            </div>
+
+            <div class="notif-body">
+              <% if (n.type === 'like' && n.like && n.like.user) { %>
+                <span class="notif-actor"><%= n.like.user.username %></span> liked your post.
+              <% } else if (n.type === 'comment' && n.comment && n.comment.user) { %>
+                <span class="notif-actor"><%= n.comment.user.username %></span> commented on your post.
+              <% } else if (n.type === 'follow' && n.followRequest && n.followRequest.follower) { %>
+                <span class="notif-actor"><%= n.followRequest.follower.username %></span> started following you.
+              <% } else { %>
+                New notification.
+              <% } %>
+              <span class="notif-time"><%= new Date(n.createdAt).toLocaleDateString() %></span>
+            </div>
+
+            <% if (!n.read) { %>
+              <span class="notif-dot"></span>
+            <% } %>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</main>

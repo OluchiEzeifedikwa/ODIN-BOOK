@@ -74,7 +74,7 @@ const getAllPosts = async (req, res, next) => {
       post.isLiked = post.likes.length > 0;
     });
 
-    res.render('posts', { posts });
+    res.redirect('/home');
   } catch (err) {
     next(err);
   }

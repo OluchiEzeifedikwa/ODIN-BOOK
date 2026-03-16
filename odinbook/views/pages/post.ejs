@@ -1,0 +1,22 @@
+<% layout("layouts/main") %>
+
+<div class="post-page">
+
+  <%- include("../partials/post-card", { post }) %>
+
+  <div class="comments">
+
+    <h3>Comments</h3>
+
+    <% comments.forEach(comment => { %>
+
+      <div class="comment">
+        <strong><%= comment.author %></strong>
+        <p><%= comment.text %></p>
+      </div>
+
+    <% }) %>
+
+  </div>
+
+</div>

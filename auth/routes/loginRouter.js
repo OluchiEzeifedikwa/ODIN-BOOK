@@ -4,7 +4,7 @@ import loginController from '../controllers/loginController.js';
 const loginRouter = Router();
 
 loginRouter.get('/login', (req, res) => {
-  res.render('login');
+  res.render('login', { layout: false });
 });
 
 loginRouter.post('/login', loginController.login);

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import minutesAgo from '../helpers/minutesAgo.js';
 
 const prisma = new PrismaClient();
 
@@ -22,24 +23,78 @@ const getEditProfileForm = async (req, res) => {
   }
 };
 
-// Get all profiles
-const getProfiles = async (req, res) => {
+// Render the profiles page — shows only users the current user follows
+const getProfilesPage = async (req, res, next) => {
   try {
+    if (!req.user) return res.redirect('/login');
+
+    const followingRecords = await prisma.followRequest.findMany({
+      where: { followerId: req.user.id, status: 'accepted' },
+      select: { followingId: true },
+    });
+    const followingIds = followingRecords.map(f => f.followingId);
+
     const profiles = await prisma.profile.findMany({
-      include: { user: true },
+      where: { userId: { in: followingIds } },
+      include: {
+        user: {
+          include: {
+            posts: {
+              include: {
+                _count: { select: { likes: true, comments: true } },
+                comments: { include: { user: { include: { profile: true } } } },
+                likes: { where: { userId: req.user.id } },
+              },
+              orderBy: { createdAt: 'desc' },
+            },
+          },
+        },
+      },
     });
 
-    if (!profiles || profiles.length === 0) {
-      return res.status(404).json({ message: 'No profiles found' });
+    for (const profile of profiles) {
+      profile.isFollowing = true; // all results are followed users
+      profile.user.posts.forEach(post => {
+        post.isLiked = post.likes.length > 0;
+      });
     }
 
-    res.render('profiles', { profiles });
+    res.render('pages/profile', { title: 'Friends', profiles, minutesAgo });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Failed to retrieve profiles' });
+    next(err);
   }
 };
 
+// Get all profiles (JSON API)
+const getProfiles = async (req, res) => {
+  const { q } = req.query;
+
+  try {
+    const profiles = await prisma.profile.findMany({
+      include: { user: true }
+    });
+
+    if (!profiles || profiles.length === 0) {
+      return res.status(404).json({ message: "No profiles found" });
+    }
+
+    // If query exists, filter profiles
+    if (q) {
+      const filteredProfiles = profiles.filter((profile) =>
+        profile.user.username.toLowerCase().includes(q.toLowerCase())
+      );
+
+      return res.json(filteredProfiles);
+    }
+
+    // Otherwise return all profiles
+    res.json(profiles);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to retrieve profiles" });
+  }
+};
 // Get profile by ID
 const getProfileById = async (req, res, next) => {
   try {
@@ -96,6 +151,7 @@ const updateProfile = async (req, res) => {
 // Default export
 export default {
   getEditProfileForm,
+  getProfilesPage,
   getProfiles,
   getProfileById,
   updateProfile,

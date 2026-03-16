@@ -1,0 +1,135 @@
+<% if (profiles && profiles.length > 0) { %>
+    <% profiles.forEach(profile => { %>
+      <% if (profile) { %>
+        <div class="profile-card">
+          <a href="/profiles/<%= profile.id %>">
+            <div class="profile-info">
+              <% if (profile.image) { %>
+                <img src="/uploads/<%= profile.image %>" alt="Profile Picture" class="profile-pic">
+              <% } else { %>
+                <div class="profile-placeholder">No Image</div>
+              <% } %>
+              <span class="username"><%= profile.user.username %></span>
+  
+              <% if (profile.user.id !== user.id) { %>
+                <button type="button" class="follow-btn" 
+                        data-user-id="<%= profile.user.id %>" 
+                        data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
+                  <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
+                </button>
+              <% } %>
+            </div>
+          </a>
+  
+          <!-- Posts -->
+          <div class="posts">
+            <% if (profile.user.posts.length === 0) { %>
+              <p style="color:#64748b; font-size:0.85rem; padding:8px 0;">No posts yet.</p>
+            <% } %>
+            <% profile.user.posts.forEach(post => { %>
+              <div class="post-card">
+                <% if (post.image) { %>
+                  <img src="/uploads/<%= post.image %>" alt="Post Image">
+                <% } %>
+                <p><%= post.content %></p>
+
+                <div class="post-actions">
+                  <button class="like-btn <%= post.isLiked ? 'liked' : '' %>" data-post-id="<%= post.id %>">
+                    <span class="heart">❤️</span> <span><%= post._count.likes %></span>
+                  </button>
+                  <button class="comment-btn" data-post-id="<%= post.id %>">
+                    💬 <span><%= post._count.comments %></span>
+                  </button>
+                </div>
+
+                <div class="comments" id="comments-<%= post.id %>">
+                  <% if (post.comments && post.comments.length > 0) { %>
+                    <% post.comments.forEach(comment => { %>
+                      <div class="comment">
+                        <% if (comment.user.profile && comment.user.profile.image) { %>
+                          <img src="/uploads/<%= comment.user.profile.image %>" alt="Profile" onerror="this.style.display='none'">
+                        <% } %>
+                        <strong><%= comment.user.username %></strong>
+                        <span style="font-size:0.8rem; color:#ccc;"><%= minutesAgo(comment.createdAt) %></span>
+                        <p><%= comment.content %></p>
+                      </div>
+                    <% }) %>
+                  <% } else { %>
+                    <p style="margin-left:35px; color:#aaa;">No comments yet.</p>
+                  <% } %>
+                </div>
+
+                <form class="comment-form" id="form-<%= post.id %>" data-post-id="<%= post.id %>" action="/posts/<%= post.id %>/comments" method="POST">
+                  <textarea name="content" placeholder="Write a comment..." required></textarea>
+                  <button type="submit">Post</button>
+                  <button type="button" class="cancel-btn">Cancel</button>
+                </form>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% } else { %>
+        <p>No profile information available</p>
+      <% } %>
+    <% }) %>
+  <% } else { %>
+    <p style="color:#64748b; text-align:center; margin-top:40px;">
+      You are not following anyone yet. Go to <a href="/home" style="color:#38bdf8;">Home</a> to follow people.
+    </p>
+  <% } %>
+
+<script>
+  document.addEventListener('click', e => {
+    const commentBtn = e.target.closest('.comment-btn');
+    const cancelBtn  = e.target.closest('.cancel-btn');
+
+    if (commentBtn) {
+      const postId   = commentBtn.dataset.postId;
+      const comments = document.getElementById(`comments-${postId}`);
+      const form     = document.getElementById(`form-${postId}`);
+      const visible  = comments.style.display === 'block';
+      comments.style.display = visible ? 'none' : 'block';
+      form.style.display     = visible ? 'none' : 'block';
+    }
+
+    if (cancelBtn) {
+      const form   = cancelBtn.closest('.comment-form');
+      const postId = form.dataset.postId;
+      document.getElementById(`comments-${postId}`).style.display = 'none';
+      form.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('.like-btn');
+    if (!btn) return;
+    const postId  = btn.dataset.postId;
+    const isLiked = btn.classList.contains('liked');
+    try {
+      const res = await fetch(`/posts/${postId}/${isLiked ? 'unlike' : 'like'}`, {
+        method: isLiked ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      btn.classList.toggle('liked');
+      btn.querySelector('span:nth-child(2)').textContent = data.likes;
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.follow-btn');
+    if (!btn) return;
+    const id          = btn.dataset.userId;
+    const isFollowing = btn.dataset.following === 'true';
+    fetch(isFollowing ? `/users/unfollow/${id}` : `/users/follow/${id}`, { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        btn.textContent        = data.following ? 'Unfollow' : 'Follow';
+        btn.dataset.following  = String(data.following);
+      })
+      .catch(err => console.error(err));
+  });
+</script>

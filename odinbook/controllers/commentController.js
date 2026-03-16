@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { createNotification } from './notificationController.js';
 const prisma = new PrismaClient();
 
 // To create a comment
@@ -14,6 +15,12 @@ const createComment = async (req, res, next) => {
     const comment = await prisma.comment.create({
       data: { content, postId, userId },
     });
+
+    // Notify the post owner (skip if they commented on their own post)
+    const post = await prisma.post.findUnique({ where: { id: postId }, select: { userId: true } });
+    if (post && post.userId !== userId) {
+      await createNotification({ userId: post.userId, type: 'comment', commentId: comment.id });
+    }
 
     res.redirect("/home");
   } catch (err) {
@@ -71,7 +78,7 @@ const deleteComment = async (req, res, next) => {
   try {
     const { id } = req.params;
     await prisma.comment.delete({ where: { id } });
-    res.redirect("/comments");
+    res.redirect("/home");
   } catch (err) {
     console.error(err);
     next(err);
