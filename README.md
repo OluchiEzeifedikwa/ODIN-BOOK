@@ -1,44 +1,60 @@
-The Odin book is a social media platform that creates an opportunity for users to post, comment, like and follow friends
+OdinBook
+A social media web application where users can connect, share posts, and interact with each other.
 
-FEATURES
-This app can be used to 
-Sign up
-Sign in
-Create Posts
-Create comments 
-Like/Unlike posts
-Like/Unlike comments
-Search for friends
-Add friends
-
-RESOURCES
-Kindly install the resources below: 
-@prisma/client
-bcryptjs
-cookie-parser
-dotenv
-ejs
-express
-express-session
-jsonwebtoken
-multer
-parser
-passport
-passport-jwt
-passport-local
-pg
-
-HOW TO RUN THE APP LOCALLY
+Features
+Sign up and log in securely
+Create and delete posts (with image uploads)
+Like and comment on posts
+Follow and unfollow users
+View your friends list
+Edit your profile (bio, location, pronoun, profile photo)
+Search for users
+Real-time notifications for likes, comments, and follows
+Tech Stack
+Backend: Node.js, Express.js
+Templating: EJS with express-ejs-layouts
+Database: PostgreSQL with Prisma ORM
+Authentication: Passport.js (session-based)
+File Uploads: Multer
+Styling: Custom CSS
+Getting Started
+Prerequisites
+Node.js (v18+)
+PostgreSQL
+Installation
 Clone the repository
-Navigate to the project directory by running cd ODIN-BOOK
-Run npm install
-To set up Prisma Client with PostgreSQL, you'll need to install the following packages, run npm install @prisma/client and npm install prisma --save-dev
-Initialize Prisma by running npx prisma init.This will create a prisma directory with a schema.prisma file.
-Configure the Postgresql database int prisma schema file
-To generate the Prisma client, run npx prisma migrate dev --name init and 
-npx prisma generate
-Visit https://localhost:5000 to view the app in the browser
 
+git clone https://github.com/your-username/odin-book.git
+cd odin-book
+Install dependencies
 
-TESTS
-You can test the app by running node --watch app.js
+npm install
+Set up environment variables — create a .env file in the root:
+
+DATABASE_URL="postgresql://user:password@localhost:5432/odinbook"
+SESSION_SECRET="your-session-secret"
+PORT=5000
+Run database migrations
+
+npx prisma migrate dev
+Start the app
+
+npm start
+The app will be running at http://localhost:5000
+
+Project Structure
+
+├── controllers/      # Request handlers
+├── services/         # Business logic
+├── repositories/     # Database queries (Prisma)
+├── routes/           # Express routers
+├── views/            # EJS templates
+├── middleware/        # Auth and error handling
+├── public/           # Static assets (CSS, images)
+├── uploads/          # User uploaded files
+└── prisma/           # Database schema and migrations
+Environment Variables
+Variable	Description
+DATABASE_URL	PostgreSQL connection string
+SESSION_SECRET	Secret key for session encryption
+PORT	Port the server runs on (default: 5000)
