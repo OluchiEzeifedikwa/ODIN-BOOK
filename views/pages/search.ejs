@@ -1,0 +1,51 @@
+<div class="notifications-page">
+  <div class="notifications-header">
+    <h2>Search Users</h2>
+  </div>
+
+  <% if (term && users.length === 0) { %>
+    <p class="no-notifs">No users found for "<%= term %>".</p>
+  <% } %>
+
+  <% if (!term) { %>
+    <p class="no-notifs">Type a username in the search bar above.</p>
+  <% } %>
+
+  <% if (users.length > 0) { %>
+    <div class="feed">
+      <% users.forEach(u => { %>
+        <div class="profile-card">
+          <div class="profile-header">
+            <div>
+              <% if (u.profile && u.profile.image) { %>
+                <img src="/uploads/<%= u.profile.image %>" class="profile-pic" onerror="this.style.display='none'">
+              <% } else { %>
+                <div class="profile-pic-placeholder"><i class="fa-solid fa-user"></i></div>
+              <% } %>
+              <span class="profile-username"><%= u.username %></span>
+            </div>
+            <button class="follow-btn" data-user-id="<%= u.id %>" data-following="<%= u.isFollowing ? 'true' : 'false' %>">
+              <%= u.isFollowing ? 'Unfollow' : 'Follow' %>
+            </button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.follow-btn');
+    if (!btn) return;
+    const id = btn.dataset.userId;
+    const isFollowing = btn.dataset.following === 'true';
+    fetch(isFollowing ? `/users/unfollow/${id}` : `/users/follow/${id}`, { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        btn.textContent = data.following ? 'Unfollow' : 'Follow';
+        btn.dataset.following = String(data.following);
+      })
+      .catch(err => console.error(err));
+  });
+</script>

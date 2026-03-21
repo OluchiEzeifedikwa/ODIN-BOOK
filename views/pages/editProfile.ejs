@@ -1,0 +1,77 @@
+<div class="edit-profile-card">
+  <h2 class="edit-profile-title">Edit Profile</h2>
+
+  <% if (typeof query !== 'undefined' && query.error) { %>
+    <p style="color:#e11d48; font-size:0.88rem; margin-bottom:12px;"><%= query.error %></p>
+  <% } %>
+
+  <% if (profile) { %>
+    <form enctype="multipart/form-data" action="/profiles/<%= profile.id %>" method="post" class="edit-profile-form">
+
+      <!-- Avatar -->
+      <div class="edit-avatar-wrap">
+        <% if (profile.image) { %>
+          <img src="/uploads/<%= profile.image %>" class="edit-avatar" id="avatar-preview">
+        <% } else { %>
+          <div class="edit-avatar edit-avatar-placeholder" id="avatar-preview-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
+        <% } %>
+        <label class="edit-avatar-label" for="profileImage">
+          <i class="fa-solid fa-camera"></i> Change photo
+        </label>
+        <input type="file" name="profileImage" id="profileImage" accept="image/*" style="display:none;">
+      </div>
+
+      <!-- Username (read-only) -->
+      <div class="edit-field">
+        <label>Username</label>
+        <input type="text" value="<%= profile.user ? profile.user.username : '' %>" disabled class="edit-input disabled">
+      </div>
+
+      <!-- Bio -->
+      <div class="edit-field">
+        <label for="bio">Bio</label>
+        <textarea name="bio" id="bio" class="edit-input edit-textarea" placeholder="Tell people about yourself…"><%= profile.bio || '' %></textarea>
+      </div>
+
+      <!-- Location -->
+      <div class="edit-field">
+        <label for="location">Location</label>
+        <input type="text" name="location" id="location" class="edit-input" placeholder="e.g. Lagos, Nigeria" value="<%= profile.location || '' %>">
+      </div>
+
+      <!-- Pronoun -->
+      <div class="edit-field">
+        <label for="pronoun">Pronoun</label>
+        <input type="text" name="pronoun" id="pronoun" class="edit-input" placeholder="e.g. she/her" value="<%= profile.pronoun || '' %>">
+      </div>
+
+      <button type="submit" class="edit-save-btn">Save Changes</button>
+    </form>
+  <% } else { %>
+    <p style="color:#64748b;">Profile not found.</p>
+  <% } %>
+</div>
+
+<script>
+  document.getElementById('profileImage').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const preview = document.getElementById('avatar-preview');
+      const placeholder = document.getElementById('avatar-preview-placeholder');
+      if (preview) {
+        preview.src = e.target.result;
+      } else if (placeholder) {
+        placeholder.outerHTML = `<img src="${e.target.result}" class="edit-avatar" id="avatar-preview">`;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.querySelector('.edit-avatar-label').addEventListener('click', () => {
+    document.getElementById('profileImage').click();
+  });
+</script>

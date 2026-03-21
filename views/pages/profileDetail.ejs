@@ -1,0 +1,225 @@
+<% if (profile) { %>
+
+  <!-- Profile Header -->
+  <div class="sp-header">
+    <div class="sp-avatar-wrap">
+      <% if (profile.image) { %>
+        <img src="/uploads/<%= profile.image %>" alt="Profile Picture" class="sp-avatar">
+      <% } else { %>
+        <div class="sp-avatar sp-avatar-placeholder"><i class="fa-solid fa-user"></i></div>
+      <% } %>
+    </div>
+    <div class="sp-info">
+      <div class="sp-name-row">
+        <h2 class="sp-username"><%= profile.user.username %></h2>
+        <% if (profile.pronoun) { %>
+          <span class="sp-pronoun"><%= profile.pronoun %></span>
+        <% } %>
+      </div>
+      <p class="sp-posts-count"><%= profile.user.posts.length %> post<%= profile.user.posts.length !== 1 ? 's' : '' %></p>
+      <% if (profile.bio) { %>
+        <p class="sp-bio"><%= profile.bio %></p>
+      <% } %>
+      <% if (profile.location) { %>
+        <p class="sp-location"><i class="fa-solid fa-location-dot"></i> <%= profile.location %></p>
+      <% } %>
+    </div>
+  </div>
+
+  <hr class="sp-divider">
+
+  <!-- Post Grid -->
+  <% if (profile.user.posts.length === 0) { %>
+    <p class="sp-no-posts">No posts yet.</p>
+  <% } else { %>
+    <div class="sp-grid">
+      <% profile.user.posts.forEach((post, i) => { %>
+        <div class="sp-grid-tile" data-index="<%= i %>">
+          <% if (post.image) { %>
+            <img src="/uploads/<%= post.image %>" alt="Post" class="sp-grid-img">
+          <% } else { %>
+            <div class="sp-grid-text-tile">
+              <p><%= post.content.length > 80 ? post.content.slice(0, 80) + '…' : post.content %></p>
+            </div>
+          <% } %>
+          <div class="sp-grid-overlay">
+            <span><i class="fa-solid fa-heart"></i> <%= post._count.likes %></span>
+            <span><i class="fa-solid fa-comment"></i> <%= post._count.comments %></span>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- Modal -->
+  <div class="sp-modal-backdrop" id="sp-modal-backdrop" style="display:none;">
+    <div class="sp-modal" id="sp-modal">
+      <button class="sp-modal-close" id="sp-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="sp-modal-inner">
+        <div class="sp-modal-media" id="sp-modal-media"></div>
+        <div class="sp-modal-side">
+          <div class="sp-modal-author">
+            <% if (profile.image) { %>
+              <img src="/uploads/<%= profile.image %>" class="sp-modal-author-avatar">
+            <% } else { %>
+              <div class="sp-modal-author-avatar sp-modal-author-placeholder"><i class="fa-solid fa-user"></i></div>
+            <% } %>
+            <strong><%= profile.user.username %></strong>
+          </div>
+          <p class="sp-modal-content" id="sp-modal-content"></p>
+          <div class="sp-modal-comments" id="sp-modal-comments"></div>
+          <div class="sp-modal-actions" id="sp-modal-actions"></div>
+          <form class="sp-modal-comment-form" id="sp-modal-comment-form">
+            <input type="text" name="content" placeholder="Add a comment…" autocomplete="off" required>
+            <button type="submit">Post</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<% } else { %>
+  <p style="color:#64748b; text-align:center; margin-top:40px;">Profile not found.</p>
+<% } %>
+
+<script>
+  const posts = <%- JSON.stringify(profile.user.posts.map(p => ({
+    id: p.id,
+    image: p.image || null,
+    content: p.content || '',
+    likes: p._count.likes,
+    comments: p._count.comments,
+    isLiked: p.isLiked,
+    commentList: p.comments.map(c => ({
+      username: c.user.username,
+      avatar: c.user.profile ? c.user.profile.image : null,
+      content: c.content,
+      time: c.createdAt,
+    })),
+  }))) %>;
+
+  const backdrop  = document.getElementById('sp-modal-backdrop');
+  const media     = document.getElementById('sp-modal-media');
+  const content   = document.getElementById('sp-modal-content');
+  const comments  = document.getElementById('sp-modal-comments');
+  const actions   = document.getElementById('sp-modal-actions');
+  const form      = document.getElementById('sp-modal-comment-form');
+  let currentPostId = null;
+
+  function minutesAgoClient(iso) {
+    const diff = Math.floor((Date.now() - new Date(iso)) / 60000);
+    if (diff < 1) return 'just now';
+    if (diff < 60) return diff + 'm ago';
+    const h = Math.floor(diff / 60);
+    if (h < 24) return h + 'h ago';
+    return Math.floor(h / 24) + 'd ago';
+  }
+
+  function renderComments(list) {
+    if (!list.length) return '<p class="sp-no-comments">No comments yet.</p>';
+    return list.map(c => `
+      <div class="comment">
+        <div class="comment-avatar">
+          ${c.avatar
+            ? `<img src="/uploads/${c.avatar}" onerror="this.style.display='none'">`
+            : `<div class="comment-avatar-placeholder"><i class="fa-solid fa-user"></i></div>`}
+        </div>
+        <div class="comment-body">
+          <div class="comment-meta">
+            <strong>${c.username}</strong>
+            <span class="comment-time">${minutesAgoClient(c.time)}</span>
+          </div>
+          <p>${c.content}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openModal(index) {
+    const post = posts[index];
+    currentPostId = post.id;
+
+    media.innerHTML = post.image
+      ? `<img src="/uploads/${post.image}" class="sp-modal-img">`
+      : `<div class="sp-modal-text-only">${post.content}</div>`;
+
+    content.textContent = post.image ? post.content : '';
+    comments.innerHTML  = renderComments(post.commentList);
+
+    const liked = post.isLiked;
+    actions.innerHTML = `
+      <button class="like-btn ${liked ? 'liked' : ''}" data-post-id="${post.id}" data-index="${index}">
+        <i class="${liked ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
+        <span>${post.likes}</span>
+      </button>
+      <span style="color:#4a6080; font-size:0.85rem; margin-left:4px;">
+        <i class="fa-regular fa-comment"></i> ${post.comments}
+      </span>
+    `;
+
+    backdrop.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.querySelectorAll('.sp-grid-tile').forEach((tile, i) => {
+    tile.addEventListener('click', () => openModal(i));
+  });
+
+  document.getElementById('sp-modal-close').addEventListener('click', () => {
+    backdrop.style.display = 'none';
+    document.body.style.overflow = '';
+  });
+
+  backdrop.addEventListener('click', e => {
+    if (e.target === backdrop) {
+      backdrop.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Like inside modal
+  document.addEventListener('click', async e => {
+    const btn = e.target.closest('#sp-modal-actions .like-btn');
+    if (!btn) return;
+    const postId  = btn.dataset.postId;
+    const index   = parseInt(btn.dataset.index);
+    const isLiked = btn.classList.contains('liked');
+    const res = await fetch(`/posts/${postId}/${isLiked ? 'unlike' : 'like'}`, {
+      method: isLiked ? 'DELETE' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    btn.classList.toggle('liked');
+    btn.querySelector('i').className = btn.classList.contains('liked') ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
+    btn.querySelector('span').textContent = data.likes;
+    posts[index].likes   = data.likes;
+    posts[index].isLiked = !isLiked;
+    // update grid overlay
+    const tile = document.querySelector(`.sp-grid-tile[data-index="${index}"] .sp-grid-overlay span`);
+    if (tile) tile.innerHTML = `<i class="fa-solid fa-heart"></i> ${data.likes}`;
+  });
+
+  // Comment inside modal
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const input = form.querySelector('input[name="content"]');
+    const val   = input.value.trim();
+    if (!val || !currentPostId) return;
+    const res = await fetch(`/posts/${currentPostId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `content=${encodeURIComponent(val)}`,
+    });
+    if (!res.ok) return;
+    const index = posts.findIndex(p => p.id === currentPostId);
+    posts[index].commentList.push({ username: 'You', avatar: null, content: val, time: new Date().toISOString() });
+    posts[index].comments += 1;
+    comments.innerHTML = renderComments(posts[index].commentList);
+    input.value = '';
+    // update grid overlay count
+    const tiles = document.querySelectorAll('.sp-grid-tile');
+    const overlaySpans = tiles[index].querySelectorAll('.sp-grid-overlay span');
+    if (overlaySpans[1]) overlaySpans[1].innerHTML = `<i class="fa-solid fa-comment"></i> ${posts[index].comments}`;
+  });
+</script>

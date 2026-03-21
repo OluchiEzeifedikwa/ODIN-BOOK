@@ -1,0 +1,25 @@
+<div class="post-page">
+
+  <div class="post-card">
+    <% if (post.image) { %>
+      <img src="/uploads/<%= post.image %>" alt="Post Image">
+    <% } %>
+    <p><%= post.content %></p>
+  </div>
+
+  <div class="comments">
+
+    <h3>Comments</h3>
+
+    <% post.comments.forEach(comment => { %>
+
+      <div class="comment">
+        <strong><%= comment.user ? comment.user.username : '' %></strong>
+        <p><%= comment.content %></p>
+      </div>
+
+    <% }) %>
+
+  </div>
+
+</div>

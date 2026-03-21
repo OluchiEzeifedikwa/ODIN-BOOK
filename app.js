@@ -4,25 +4,24 @@ import passport from "./passport.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import methodOverride from "method-override";
-import cookieParser from "cookie-parser";
 import flash from "connect-flash";
-import authSignup from "./auth/routes/signupRouter.js";
-import authLogin from "./auth/routes/loginRouter.js";
-import postRouter from "./odinbook/routes/postRouter.js";
-import commentRouter from "./odinbook/routes/commentRouter.js";
-import homeRouter from "./odinbook/routes/homeRouter.js";
-import profileRouter from "./odinbook/routes/profileRouter.js";
-import likeRouter from "./odinbook/routes/likeRouter.js";
-import followRequestRouter from "./odinbook/routes/followRequestRouter.js";
-import notificationRouter from "./odinbook/routes/notificationRouter.js";
-import errorHandler from "./odinbook/middleware/errorHandler.js";
+import authSignup from "./routes/signupRouter.js";
+import authLogin from "./routes/loginRouter.js";
+import postRouter from "./routes/postRouter.js";
+import commentRouter from "./routes/commentRouter.js";
+import homeRouter from "./routes/homeRouter.js";
+import profileRouter from "./routes/profileRouter.js";
+import likeRouter from "./routes/likeRouter.js";
+import followRequestRouter from "./routes/followRequestRouter.js";
+import notificationRouter from "./routes/notificationRouter.js";
+import searchRouter from "./routes/searchRouter.js";
+import errorHandler from "./middleware/errorHandler.js";
 import expressLayouts from "express-ejs-layouts";
 import cors from "cors";
 import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
+import { countNotifications } from "./repositories/notificationRepository.js";
+import { findProfileByUserId } from "./repositories/profileRepository.js";
 dotenv.config();
-
-const prisma = new PrismaClient();
 
 const app = express();
 
@@ -34,10 +33,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.set("views", [
-  path.join(__dirname, "odinbook", "views"),
-  path.join(__dirname, "auth", "views"),
-]);
+app.set("views", path.join(__dirname, "views"));
 
 app.set("view engine", "ejs");
 app.use(expressLayouts);
@@ -63,7 +59,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(cookieParser());
 app.use(flash());
 app.use(methodOverride("_method"));
 
@@ -83,14 +78,30 @@ app.use(async (req, res, next) => {
   if (req.user) {
     try {
       const [count, profile] = await Promise.all([
-        prisma.notification.count({ where: { userId: req.user.id, read: false } }),
-        prisma.profile.findUnique({ where: { userId: req.user.id }, select: { image: true, id: true } }),
+        countNotifications({ where: { userId: req.user.id, read: false } }),
+        findProfileByUserId(req.user.id, { select: { image: true, id: true } }),
       ]);
       res.locals.unreadCount = count;
       res.locals.currentUserProfile = profile;
     } catch (_) {}
   }
   next();
+});
+
+/* ---------------- Current user profile redirect ---------------- */
+app.get('/profile', async (req, res) => {
+  if (!req.user) return res.redirect('/login');
+  const profile = await findProfileByUserId(req.user.id);
+  if (profile) return res.redirect(`/editProfile/${profile.id}`);
+  res.redirect('/home');
+});
+
+/* ---------------- Logout ---------------- */
+app.post('/logout', (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    res.redirect('/login');
+  });
 });
 
 /* ---------------- Routes ---------------- */
@@ -103,6 +114,7 @@ app.use(homeRouter);
 app.use(likeRouter);
 app.use(followRequestRouter);
 app.use(notificationRouter);
+app.use(searchRouter);
 
 /* ---------------- Error handling ---------------- */
 app.use(errorHandler);

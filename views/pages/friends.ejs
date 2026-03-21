@@ -1,0 +1,21 @@
+<h2 class="friends-heading">Friends</h2>
+
+<% if (profiles && profiles.length > 0) { %>
+  <div class="friends-list">
+    <% profiles.forEach(profile => { %>
+      <% if (profile) { %>
+        <a href="/profiles/<%= profile.id %>" class="friend-row">
+          <% if (profile.image) { %>
+            <img src="/uploads/<%= profile.image %>" alt="Profile Picture" class="friend-row-avatar">
+          <% } else { %>
+            <div class="friend-row-avatar friend-row-placeholder"><i class="fa-solid fa-user"></i></div>
+          <% } %>
+          <span class="friend-row-name"><%= profile.user.username %></span>
+          <i class="fa-solid fa-chevron-right friend-row-arrow"></i>
+        </a>
+      <% } %>
+    <% }) %>
+  </div>
+<% } else { %>
+  <p class="friends-empty">You are not following anyone yet. Search for people to follow.</p>
+<% } %>
