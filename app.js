@@ -1,6 +1,9 @@
 import express from "express";
 import session from "express-session";
+import connectPgSimple from "connect-pg-simple";
 import passport from "./passport.js";
+
+const PgSession = connectPgSimple(session);
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import methodOverride from "method-override";
@@ -51,9 +54,18 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
+    store: new PgSession({
+      conString: process.env.DATABASE_URL,
+      tableName: 'session',
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24,
+    },
   })
 );
 
