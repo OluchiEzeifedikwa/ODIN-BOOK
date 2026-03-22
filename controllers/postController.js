@@ -17,7 +17,7 @@ const createPostHandler = async (req, res, next) => {
     }
 
     const { content } = req.body;
-    const image = req.file ? req.file.filename : null;
+    const image = req.file ? req.file.path : null;
 
     await createNewPost({ content, image, userId: req.user.id });
 

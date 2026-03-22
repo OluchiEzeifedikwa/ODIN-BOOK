@@ -18,7 +18,7 @@
           <div class="profile-header">
             <div>
               <% if (u.profile && u.profile.image) { %>
-                <img src="/uploads/<%= u.profile.image %>" class="profile-pic" onerror="this.style.display='none'">
+                <img src="<%= u.profile.image %>" class="profile-pic" onerror="this.style.display='none'">
               <% } else { %>
                 <div class="profile-pic-placeholder"><i class="fa-solid fa-user"></i></div>
               <% } %>

@@ -11,7 +11,7 @@
       <!-- Avatar -->
       <div class="edit-avatar-wrap">
         <% if (profile.image) { %>
-          <img src="/uploads/<%= profile.image %>" class="edit-avatar" id="avatar-preview">
+          <img src="<%= profile.image %>" class="edit-avatar" id="avatar-preview">
         <% } else { %>
           <div class="edit-avatar edit-avatar-placeholder" id="avatar-preview-placeholder">
             <i class="fa-solid fa-user"></i>

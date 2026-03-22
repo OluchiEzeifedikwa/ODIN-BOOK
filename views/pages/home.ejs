@@ -4,7 +4,7 @@
         <div class="profile-card">
           <div class="profile-header">
             <div style="display: flex; align-items: center;">
-              <img src="/uploads/<%= profile.image || '' %>" alt="Profile Picture"
+              <img src="<%= profile.image || '' %>" alt="Profile Picture"
                 onerror="this.style.display='none'">
               <span class="profile-username"><%= profile.user.username %></span>
             </div>
@@ -19,7 +19,7 @@
             <% profile.user.posts.forEach(post => { %>
               <div class="post-card">
                 <% if(post.image){ %>
-                  <img src="/uploads/<%= post.image %>" alt="Post Image">
+                  <img src="<%= post.image %>" alt="Post Image">
                 <% } %>
                 <p><%= post.content %></p>
 
@@ -46,7 +46,7 @@
                     <% post.comments.forEach(comment => { %>
                       <div class="comment">
                         <% if (comment.user.profile && comment.user.profile.image) { %>
-                          <img src="/uploads/<%= comment.user.profile.image %>" alt="Profile Image"
+                          <img src="<%= comment.user.profile.image %>" alt="Profile Image"
                             onerror="this.style.display='none'">
                         <% } %>
                         <div class="comment-body">

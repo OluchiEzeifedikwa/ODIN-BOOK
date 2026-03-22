@@ -6,7 +6,7 @@
       <% if (profile) { %>
         <a href="/profiles/<%= profile.id %>" class="friend-row">
           <% if (profile.image) { %>
-            <img src="/uploads/<%= profile.image %>" alt="Profile Picture" class="friend-row-avatar">
+            <img src="<%= profile.image %>" alt="Profile Picture" class="friend-row-avatar">
           <% } else { %>
             <div class="friend-row-avatar friend-row-placeholder"><i class="fa-solid fa-user"></i></div>
           <% } %>

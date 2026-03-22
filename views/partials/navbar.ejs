@@ -20,7 +20,7 @@
       </a>
       <a href="/profile">
         <% if (currentUserProfile && currentUserProfile.image) { %>
-          <img src="/uploads/<%= currentUserProfile.image %>" class="profile-pic" onerror="this.style.display='none'">
+          <img src="<%= currentUserProfile.image %>" class="profile-pic" onerror="this.style.display='none'">
         <% } else { %>
           <div class="profile-pic-placeholder"><i class="fa-solid fa-user"></i></div>
         <% } %>

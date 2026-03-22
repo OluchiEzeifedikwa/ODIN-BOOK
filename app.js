@@ -42,11 +42,11 @@ app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "layouts/main");
 
+/* ---------------- Trust proxy (needed for Render/Heroku) ---------------- */
+app.set('trust proxy', 1);
+
 /* ---------------- CORS ---------------- */
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true,
-}));
+app.use(cors({ credentials: true }));
 
 /* ---------------- Middleware ---------------- */
 app.use(express.json());

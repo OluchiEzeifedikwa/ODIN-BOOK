@@ -76,7 +76,7 @@ const updateProfileHandler = async (req, res) => {
       bio,
       location,
       pronoun,
-      filename: req.file ? req.file.filename : undefined,
+      filename: req.file ? req.file.path : undefined,
     });
 
     res.redirect(`/profiles/${id}`);

@@ -1,17 +1,12 @@
 import { Router } from 'express';
 import profileController from '../controllers/profileController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
-import path from 'path';
 import multer from 'multer';
+import { profileStorage } from '../services/cloudinary.js';
 
 const profileRouter = Router();
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, 'uploads/'),
-  filename: (_req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
-});
-
-const upload = multer({ storage });
+const upload = multer({ storage: profileStorage });
 
 profileRouter.get('/editProfile/:id', authMiddleware, profileController.getEditProfileForm);
 profileRouter.get('/profiles', authMiddleware, profileController.getProfilesPage);

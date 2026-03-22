@@ -1,18 +1,12 @@
 import { Router } from 'express';
 import postController from '../controllers/postController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
-import path from 'path';
 import multer from 'multer';
+import { postStorage } from '../services/cloudinary.js';
 
 const postRouter = Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + path.extname(file.originalname)),
-});
-
-const upload = multer({ storage });
+const upload = multer({ storage: postStorage });
 
 postRouter.get('/createPost', authMiddleware, postController.getCreatePost);
 postRouter.post('/posts', authMiddleware, upload.single('postImage'), postController.createPost);
