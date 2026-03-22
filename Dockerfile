@@ -10,6 +10,6 @@ COPY . .
 RUN npx prisma generate
 
 EXPOSE 5000
-CMD ["node", "app.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node app.js"]
 
 
