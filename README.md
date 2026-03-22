@@ -147,18 +147,6 @@ ODIN-BOOK/
 ### Profile
 ![Profile](public/images/screenshots/profile.png)
 
-### Friends
-![Friends](public/images/screenshots/friends.png)
-
-### Edit Profile
-![Edit Profile](public/images/screenshots/edit-profile.png)
-
-### Search
-![Search](public/images/screenshots/search.png)
-
-### Notifications
-![Notifications](public/images/screenshots/notifications.png)
-
 ## Environment Variables
 
 | Variable         | Description                               |
