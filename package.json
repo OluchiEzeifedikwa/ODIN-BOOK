@@ -33,6 +33,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "prisma": "^6.4.1"
+    "prisma": "^6.4.1",
+    "puppeteer": "^24.40.0"
   }
 }
