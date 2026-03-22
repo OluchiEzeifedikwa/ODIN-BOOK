@@ -14,7 +14,11 @@ export const addComment = async ({ content, postId, userId }) => {
 
   const post = await findPostById(postId, { select: { userId: true } });
   if (post && post.userId !== userId) {
-    await createNotification({ userId: post.userId, type: 'comment', commentId: comment.id });
+    try {
+      await createNotification({ userId: post.userId, type: 'comment', commentId: comment.id });
+    } catch (e) {
+      console.error('Notification error (comment):', e.message);
+    }
   }
 
   return comment;

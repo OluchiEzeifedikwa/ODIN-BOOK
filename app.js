@@ -2,8 +2,6 @@ import express from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import passport from "./passport.js";
-
-const PgSession = connectPgSimple(session);
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import methodOverride from "method-override";
@@ -26,6 +24,7 @@ import { countNotifications } from "./repositories/notificationRepository.js";
 import { findProfileByUserId } from "./repositories/profileRepository.js";
 dotenv.config();
 
+const PgSession = connectPgSimple(session);
 const app = express();
 
 /* ---------------- ES module __dirname replacement ---------------- */
@@ -64,6 +63,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 1000 * 60 * 60 * 24,
     },
   })

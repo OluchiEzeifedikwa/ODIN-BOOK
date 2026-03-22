@@ -7,7 +7,11 @@ import { createNotification } from './notificationService.js';
 // Follow a user — immediately accepted
 export const sendFollowRequest = async (followerId, receiverId) => {
   const followRequest = await upsertFollowRequest(followerId, receiverId);
-  await createNotification({ userId: receiverId, type: 'follow', followRequestId: followRequest.id });
+  try {
+    await createNotification({ userId: receiverId, type: 'follow', followRequestId: followRequest.id });
+  } catch (e) {
+    console.error('Notification error (follow):', e.message);
+  }
   return { following: true };
 };
 

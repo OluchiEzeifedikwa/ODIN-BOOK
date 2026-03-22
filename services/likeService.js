@@ -11,7 +11,11 @@ export const likePost = async (postId, userId) => {
 
   const post = await findPostById(postId, { select: { userId: true } });
   if (post && post.userId !== userId) {
-    await createNotification({ userId: post.userId, type: 'like', likeId: like.id });
+    try {
+      await createNotification({ userId: post.userId, type: 'like', likeId: like.id });
+    } catch (e) {
+      console.error('Notification error (like):', e.message);
+    }
   }
 
   const likeCount = await countLikes(postId);
