@@ -36,6 +36,9 @@ a {
 .layout {
   display: flex;
   min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* ============================================================
@@ -370,7 +373,7 @@ a {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 800px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
@@ -1872,6 +1875,23 @@ a {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
+}
+
+/* ============================================================
+   TABLET LANDSCAPE  (≤ 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .feed {
+    max-width: 100%;
+  }
+
+  .content {
+    padding: 24px 18px;
+  }
 }
 
 /* ============================================================
