@@ -759,7 +759,7 @@ a {
    EDIT PROFILE
    ============================================================ */
 .edit-profile-card {
-  max-width: 480px;
+  max-width: 720px;
   margin: 0 auto;
   background: #ffffff;
   border: 1px solid #d8e4f0;
@@ -1764,7 +1764,7 @@ a {
    EDIT PROFILE PAGE
    ============================================================ */
 .post-container {
-  max-width: 600px;
+  max-width: 860px;
   margin: 28px auto;
   padding: 0 16px;
 }
