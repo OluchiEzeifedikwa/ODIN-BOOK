@@ -961,9 +961,10 @@ a {
   background: #ffffff;
   border: 1px solid #d8e4f0;
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 20px 24px;
   overflow: hidden;
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 10px rgba(30,58,95,0.08);
 }
 
 .post-card:hover {
