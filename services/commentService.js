@@ -24,9 +24,13 @@ export const addComment = async ({ content, postId, userId }) => {
   return comment;
 };
 
-// Get all comments
-export const getAllComments = async () => {
-  return findComments({});
+// Get all comments for a post
+export const getAllComments = async (postId) => {
+  return findComments({
+    where: { postId },
+    orderBy: { createdAt: 'asc' },
+    include: { user: { include: { profile: true } } },
+  });
 };
 
 // Get a single comment by ID

@@ -19,11 +19,12 @@ const createCommentHandler = async (req, res, next) => {
   }
 };
 
-// Get all comments
-const getAllCommentsHandler = async (_req, res, next) => {
+// Get all comments for a post (returns JSON for lazy loading)
+const getAllCommentsHandler = async (req, res, next) => {
   try {
-    await getAllComments();
-    res.redirect('/home');
+    const { postId } = req.params;
+    const comments = await getAllComments(postId);
+    res.json(comments);
   } catch (err) {
     console.error(err);
     next(err);
