@@ -113,26 +113,36 @@
       }
     });
 
-    // Like button
+    // Like button — optimistic update
     document.addEventListener('click', async e => {
       const btn = e.target.closest('.like-btn');
       if (!btn) return;
+
       const postId = btn.dataset.postId;
       const isLiked = btn.classList.contains('liked');
+      const countEl = btn.querySelector('span');
+      const icon = btn.querySelector('i');
+
+      // Update UI immediately
+      btn.classList.toggle('liked');
+      icon.classList.toggle('fa-solid');
+      icon.classList.toggle('fa-regular');
+      countEl.textContent = isLiked ? parseInt(countEl.textContent) - 1 : parseInt(countEl.textContent) + 1;
+
       try {
         const res = await fetch(`/posts/${postId}/${isLiked ? 'unlike' : 'like'}`, {
           method: isLiked ? 'DELETE' : 'POST',
           headers: { 'Content-Type': 'application/json' },
         });
-        if (!res.ok) return;
+        if (!res.ok) throw new Error('Request failed');
         const data = await res.json();
+        countEl.textContent = data.likes;
+      } catch (err) {
+        // Revert UI if request failed
         btn.classList.toggle('liked');
-        const icon = btn.querySelector('i');
         icon.classList.toggle('fa-solid');
         icon.classList.toggle('fa-regular');
-        btn.querySelector('span').textContent = data.likes;
-      } catch (err) {
-        console.error(err);
+        countEl.textContent = isLiked ? parseInt(countEl.textContent) + 1 : parseInt(countEl.textContent) - 1;
       }
     });
 
