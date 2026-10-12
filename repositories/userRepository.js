@@ -3,6 +3,9 @@ import prisma from './prismaClient.js';
 export const findUserByEmail = (email) =>
   prisma.user.findUnique({ where: { email } });
 
+export const findUserByUsername = (username) =>
+  prisma.user.findUnique({ where: { username } });
+
 export const findUserById = (id) =>
   prisma.user.findUnique({ where: { id } });
 

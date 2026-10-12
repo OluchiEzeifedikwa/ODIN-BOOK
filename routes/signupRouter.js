@@ -3,9 +3,7 @@ import signupController from '../controllers/signupController.js';
 
 const signupRouter = Router();
 
-signupRouter.get('/signup', (req, res) => {
-  res.render('auth/signup', { layout: false });
-});
+signupRouter.get('/signup', signupController.getSignupForm);
 
 signupRouter.post('/signup', signupController.signup);
 
