@@ -13,6 +13,11 @@
   <script>
     const loadedComments = new Set();
 
+    // Escape user-written text before putting it into innerHTML
+    const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, ch => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+    ));
+
     async function fetchComments(postId) {
       if (loadedComments.has(postId)) return;
       loadedComments.add(postId);
@@ -26,12 +31,12 @@
         } else {
           container.innerHTML = comments.map(c => `
             <div class="comment">
-              ${c.user.profile?.image ? `<img src="${c.user.profile.image}" alt="Avatar" onerror="this.style.display='none'">` : ''}
+              ${c.user.profile?.image ? `<img src="${escapeHtml(c.user.profile.image)}" alt="Avatar" onerror="this.style.display='none'">` : ''}
               <div class="comment-body">
                 <div class="comment-meta">
-                  <strong>${c.user.username}</strong>
+                  <strong>${escapeHtml(c.user.username)}</strong>
                 </div>
-                <p>${c.content}</p>
+                <p>${escapeHtml(c.content)}</p>
               </div>
             </div>
           `).join('');

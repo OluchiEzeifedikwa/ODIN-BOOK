@@ -20,7 +20,7 @@
         <label class="edit-avatar-label" for="profileImage">
           <i class="fa-solid fa-camera"></i> Change photo
         </label>
-        <input type="file" name="profileImage" id="profileImage" accept="image/*" style="display:none;">
+        <input type="file" name="profileImage" id="profileImage" accept="image/jpeg,image/png,image/webp" style="display:none;">
       </div>
 
       <!-- Username (read-only) -->
@@ -32,19 +32,19 @@
       <!-- Bio -->
       <div class="edit-field">
         <label for="bio">Bio</label>
-        <textarea name="bio" id="bio" class="edit-input edit-textarea" placeholder="Tell people about yourself…"><%= profile.bio || '' %></textarea>
+        <textarea name="bio" id="bio" maxlength="300" class="edit-input edit-textarea" placeholder="Tell people about yourself…"><%= profile.bio || '' %></textarea>
       </div>
 
       <!-- Location -->
       <div class="edit-field">
         <label for="location">Location</label>
-        <input type="text" name="location" id="location" class="edit-input" placeholder="e.g. Lagos, Nigeria" value="<%= profile.location || '' %>">
+        <input type="text" name="location" id="location" maxlength="100" class="edit-input" placeholder="e.g. Lagos, Nigeria" value="<%= profile.location || '' %>">
       </div>
 
       <!-- Pronoun -->
       <div class="edit-field">
         <label for="pronoun">Pronoun</label>
-        <input type="text" name="pronoun" id="pronoun" class="edit-input" placeholder="e.g. she/her" value="<%= profile.pronoun || '' %>">
+        <input type="text" name="pronoun" id="pronoun" maxlength="30" class="edit-input" placeholder="e.g. she/her" value="<%= profile.pronoun || '' %>">
       </div>
 
       <button type="submit" class="edit-save-btn">Save Changes</button>

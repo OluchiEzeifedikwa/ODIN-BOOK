@@ -3,10 +3,6 @@ import { addComment, getAllComments, getComment, editComment, removeComment } fr
 // To create a comment
 const createCommentHandler = async (req, res, next) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'You must be logged in to create a post' });
-    }
-
     const { postId } = req.params;
     const { content } = req.body;
 
@@ -14,7 +10,6 @@ const createCommentHandler = async (req, res, next) => {
 
     res.redirect("/home");
   } catch (err) {
-    console.error(err);
     next(err);
   }
 };
@@ -26,7 +21,6 @@ const getAllCommentsHandler = async (req, res, next) => {
     const comments = await getAllComments(postId);
     res.json(comments);
   } catch (err) {
-    console.error(err);
     next(err);
   }
 };
@@ -38,8 +32,6 @@ const getCommentById = async (req, res, next) => {
     await getComment(commentId);
     res.redirect('/home');
   } catch (err) {
-    if (err.message === 'Comment not found') return res.status(404).json({ message: 'Comment not found' });
-    console.error(err);
     next(err);
   }
 };
@@ -50,10 +42,9 @@ const updateCommentHandler = async (req, res, next) => {
     const { commentId } = req.params;
     const { content } = req.body;
 
-    await editComment(commentId, content);
+    await editComment(commentId, req.user.id, content);
     res.redirect('/home');
   } catch (err) {
-    console.error(err);
     next(err);
   }
 };
@@ -62,10 +53,9 @@ const updateCommentHandler = async (req, res, next) => {
 const deleteCommentHandler = async (req, res, next) => {
   try {
     const { commentId } = req.params;
-    await removeComment(commentId);
+    await removeComment(commentId, req.user.id);
     res.redirect("/home");
   } catch (err) {
-    console.error(err);
     next(err);
   }
 };

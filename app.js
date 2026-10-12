@@ -18,10 +18,10 @@ import notificationRouter from "./routes/notificationRouter.js";
 import searchRouter from "./routes/searchRouter.js";
 import errorHandler from "./middleware/errorHandler.js";
 import expressLayouts from "express-ejs-layouts";
-import cors from "cors";
 import dotenv from "dotenv";
 import { countNotifications } from "./repositories/notificationRepository.js";
 import { findProfileByUserId } from "./repositories/profileRepository.js";
+import { httpError } from "./services/httpError.js";
 dotenv.config();
 
 const PgSession = connectPgSimple(session);
@@ -43,9 +43,6 @@ app.set("layout", "layouts/main");
 
 /* ---------------- Trust proxy (needed for Render/Heroku) ---------------- */
 app.set('trust proxy', 1);
-
-/* ---------------- CORS ---------------- */
-app.use(cors({ credentials: true }));
 
 /* ---------------- Middleware ---------------- */
 app.use(express.json());
@@ -101,11 +98,15 @@ app.use(async (req, res, next) => {
 });
 
 /* ---------------- Current user profile redirect ---------------- */
-app.get('/profile', async (req, res) => {
+app.get('/profile', async (req, res, next) => {
   if (!req.user) return res.redirect('/login');
-  const profile = await findProfileByUserId(req.user.id);
-  if (profile) return res.redirect(`/editProfile/${profile.id}`);
-  res.redirect('/home');
+  try {
+    const profile = await findProfileByUserId(req.user.id);
+    if (profile) return res.redirect(`/editProfile/${profile.id}`);
+    res.redirect('/home');
+  } catch (err) {
+    next(err);
+  }
 });
 
 /* ---------------- Logout ---------------- */
@@ -129,16 +130,9 @@ app.use(notificationRouter);
 app.use(searchRouter);
 
 /* ---------------- Error handling ---------------- */
+// Any request no route handled
+app.use((req, res, next) => next(httpError(404, 'Page not found')));
 app.use(errorHandler);
-
-/* ---------------- Test routes ---------------- */
-app.get("/error", (req, res) => {
-  throw new Error("Something went wrong");
-});
-
-app.get("/test", (req, res) => {
-  res.render("index");
-});
 
 /* ---------------- Server ---------------- */
 const PORT = process.env.PORT || 5000;

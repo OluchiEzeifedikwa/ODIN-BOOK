@@ -3,14 +3,18 @@
   <h1 class="header">Create Post</h1>
 
   <form class="createpost-card" enctype="multipart/form-data" action="/posts" method="post">
+    <% if (error) { %>
+      <div class="flash-error" role="alert"><%= error %></div>
+    <% } %>
+
     <div>
-      <label for="postImage">Image (optional)</label>
-      <input type="file" id="postImage" name="postImage" accept="image/*">
+      <label for="postImage">Image (optional, JPG/PNG/WebP up to 5MB)</label>
+      <input type="file" id="postImage" name="postImage" accept="image/jpeg,image/png,image/webp">
     </div>
 
     <div>
       <label for="content">What's on your mind?</label>
-      <input type="text" id="content" name="content" placeholder="Write something..." required>
+      <input type="text" id="content" name="content" placeholder="Write something..." required maxlength="2000" value="<%= content %>">
     </div>
 
     <button type="submit">Post</button>
