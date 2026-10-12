@@ -1,12 +1,10 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
+import prisma from './repositories/prismaClient.js';
 
 dotenv.config();
-
-const prisma = new PrismaClient();
 
 passport.use(
   new LocalStrategy(
