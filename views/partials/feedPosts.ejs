@@ -1,0 +1,54 @@
+<% posts.forEach(post => { %>
+  <div class="profile-card">
+    <div class="profile-header">
+      <div style="display: flex; align-items: center;">
+        <img src="<%= post.user.profile?.image || '' %>" alt="Profile Picture"
+          onerror="this.style.display='none'">
+        <span class="profile-username"><%= post.user.username %></span>
+      </div>
+      <% if (post.user.id !== user.id) { %>
+        <button class="follow-btn" data-user-id="<%= post.user.id %>" data-following="<%= post.isFollowing ? 'true' : 'false' %>">
+          <%= post.isFollowing ? 'Unfollow' : 'Follow' %>
+        </button>
+      <% } %>
+    </div>
+
+    <div class="posts">
+      <div class="post-card">
+        <% if(post.image){ %>
+          <img src="<%= post.image %>" alt="Post Image">
+        <% } %>
+        <p><%= post.content %></p>
+
+        <% if (post.userId === user.id) { %>
+          <form action="/posts/delete/<%= post.id %>" method="POST" style="margin-top:8px" onsubmit="return confirm('Delete this post?')">
+            <button type="submit" class="delete-post-btn">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+          </form>
+        <% } %>
+
+        <div class="post-actions">
+          <button class="like-btn <%= post.isLiked ? 'liked' : '' %>" data-post-id="<%= post.id %>">
+            <i class="<%= post.isLiked ? 'fa-solid' : 'fa-regular' %> fa-heart"></i> <span><%= post._count.likes %></span>
+          </button>
+          <button class="comment-btn" data-post-id="<%= post.id %>">
+            💬 <span><%= post._count.comments %></span>
+          </button>
+        </div>
+
+        <!-- Comments (loaded lazily) -->
+        <div class="comments" id="comments-<%= post.id %>" style="display:none;">
+          <p class="comments-loading" style="color:#aaa; margin-left:35px;">Loading...</p>
+        </div>
+
+        <!-- Comment form -->
+        <form class="comment-form" id="form-<%= post.id %>" data-post-id="<%= post.id %>" action="/posts/<%= post.id %>/comments" method="POST" style="display:none;">
+          <textarea name="content" placeholder="Write a comment..." required></textarea>
+          <button type="submit">Post</button>
+          <button type="button" class="cancel-btn">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+<% }) %>

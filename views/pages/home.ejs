@@ -1,62 +1,13 @@
   <main class="main-content">
-    <div class="feed">
-      <% profiles.forEach(profile => { %>
-        <div class="profile-card">
-          <div class="profile-header">
-            <div style="display: flex; align-items: center;">
-              <img src="<%= profile.image || '' %>" alt="Profile Picture"
-                onerror="this.style.display='none'">
-              <span class="profile-username"><%= profile.user.username %></span>
-            </div>
-            <% if (profile.user.id !== user.id) { %>
-              <button class="follow-btn" data-user-id="<%= profile.user.id %>" data-following="<%= profile.isFollowing ? 'true' : 'false' %>">
-                <%= profile.isFollowing ? 'Unfollow' : 'Follow' %>
-              </button>
-            <% } %>
-          </div>
-
-          <div class="posts">
-            <% profile.user.posts.forEach(post => { %>
-              <div class="post-card">
-                <% if(post.image){ %>
-                  <img src="<%= post.image %>" alt="Post Image">
-                <% } %>
-                <p><%= post.content %></p>
-
-                <% if (post.userId === user.id) { %>
-                  <form action="/posts/delete/<%= post.id %>" method="POST" style="margin-top:8px" onsubmit="return confirm('Delete this post?')">
-                    <button type="submit" class="delete-post-btn">
-                      <i class="fa-solid fa-trash"></i> Delete
-                    </button>
-                  </form>
-                <% } %>
-
-                <div class="post-actions">
-                  <button class="like-btn <%= post.isLiked ? 'liked' : '' %>" data-post-id="<%= post.id %>">
-                    <i class="<%= post.isLiked ? 'fa-solid' : 'fa-regular' %> fa-heart"></i> <span><%= post._count.likes %></span>
-                  </button>
-                  <button class="comment-btn" data-post-id="<%= post.id %>">
-                    💬 <span><%= post._count.comments %></span>
-                  </button>
-                </div>
-
-                <!-- Comments (loaded lazily) -->
-                <div class="comments" id="comments-<%= post.id %>" style="display:none;">
-                  <p class="comments-loading" style="color:#aaa; margin-left:35px;">Loading...</p>
-                </div>
-
-                <!-- Comment form -->
-                <form class="comment-form" id="form-<%= post.id %>" data-post-id="<%= post.id %>" action="/posts/<%= post.id %>/comments" method="POST" style="display:none;">
-                  <textarea name="content" placeholder="Write a comment..." required></textarea>
-                  <button type="submit">Post</button>
-                  <button type="button" class="cancel-btn">Cancel</button>
-                </form>
-              </div>
-            <% }) %>
-          </div>
-        </div>
-      <% }) %>
+    <div class="feed" id="feed">
+      <%- include('../partials/feedPosts', { posts, user }) %>
     </div>
+
+    <% if (nextCursor) { %>
+      <div id="feed-more" data-next-cursor="<%= nextCursor %>" style="text-align:center; margin:24px 0;">
+        <a href="/home?cursor=<%= nextCursor %>" class="follow-btn" style="text-decoration:none;">Load more</a>
+      </div>
+    <% } %>
   </main>
 
   <script>
@@ -155,9 +106,53 @@
       fetch(isFollowing ? `/users/unfollow/${id}` : `/users/follow/${id}`, { method: 'POST' })
         .then(r => r.json())
         .then(data => {
-          btn.textContent = data.following ? 'Unfollow' : 'Follow';
-          btn.dataset.following = String(data.following);
+          // The same user can appear on several posts in the feed
+          document.querySelectorAll(`.follow-btn[data-user-id="${id}"]`).forEach(b => {
+            b.textContent = data.following ? 'Unfollow' : 'Follow';
+            b.dataset.following = String(data.following);
+          });
         })
         .catch(err => console.error(err));
     });
+
+    // Infinite scroll — fetch the next page when the "Load more" block comes into view
+    const feedMore = document.getElementById('feed-more');
+    if (feedMore) {
+      let loading = false;
+
+      async function loadMore() {
+        const cursor = feedMore.dataset.nextCursor;
+        if (loading || !cursor) return;
+        loading = true;
+        try {
+          const res = await fetch(`/home?partial=1&cursor=${encodeURIComponent(cursor)}`);
+          if (!res.ok) throw new Error('Request failed');
+          const { html, nextCursor } = await res.json();
+          document.getElementById('feed').insertAdjacentHTML('beforeend', html);
+          if (nextCursor) {
+            feedMore.dataset.nextCursor = nextCursor;
+            feedMore.querySelector('a').href = `/home?cursor=${nextCursor}`;
+          } else {
+            observer.disconnect();
+            feedMore.remove();
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          loading = false;
+        }
+        // On tall screens the block may still be visible, which won't re-trigger the observer
+        if (feedMore.isConnected && feedMore.getBoundingClientRect().top < window.innerHeight + 400) loadMore();
+      }
+
+      feedMore.querySelector('a').addEventListener('click', e => {
+        e.preventDefault();
+        loadMore();
+      });
+
+      const observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) loadMore();
+      }, { rootMargin: '400px' });
+      observer.observe(feedMore);
+    }
   </script>
