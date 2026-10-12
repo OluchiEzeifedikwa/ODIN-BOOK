@@ -96,7 +96,15 @@
       content: c.content,
       time: c.createdAt,
     })),
-  }))) %>;
+  }))).replace(/</g, '\\u003c') %>;
+
+  // Escape user-written text before putting it into innerHTML
+  const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, ch => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+  ));
+
+  // Images are full Cloudinary URLs; older uploads are bare filenames served from /uploads
+  const imageUrl = src => escapeHtml(/^https?:\/\//.test(src) ? src : `/uploads/${src}`);
 
   const backdrop  = document.getElementById('sp-modal-backdrop');
   const media     = document.getElementById('sp-modal-media');
@@ -121,15 +129,15 @@
       <div class="comment">
         <div class="comment-avatar">
           ${c.avatar
-            ? `<img src="/uploads/${c.avatar}" onerror="this.style.display='none'">`
+            ? `<img src="${imageUrl(c.avatar)}" onerror="this.style.display='none'">`
             : `<div class="comment-avatar-placeholder"><i class="fa-solid fa-user"></i></div>`}
         </div>
         <div class="comment-body">
           <div class="comment-meta">
-            <strong>${c.username}</strong>
+            <strong>${escapeHtml(c.username)}</strong>
             <span class="comment-time">${minutesAgoClient(c.time)}</span>
           </div>
-          <p>${c.content}</p>
+          <p>${escapeHtml(c.content)}</p>
         </div>
       </div>
     `).join('');
@@ -140,8 +148,8 @@
     currentPostId = post.id;
 
     media.innerHTML = post.image
-      ? `<img src="/uploads/${post.image}" class="sp-modal-img">`
-      : `<div class="sp-modal-text-only">${post.content}</div>`;
+      ? `<img src="${imageUrl(post.image)}" class="sp-modal-img">`
+      : `<div class="sp-modal-text-only">${escapeHtml(post.content)}</div>`;
 
     content.textContent = post.image ? post.content : '';
     comments.innerHTML  = renderComments(post.commentList);
