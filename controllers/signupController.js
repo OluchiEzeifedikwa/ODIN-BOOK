@@ -1,55 +1,26 @@
-import bcrypt from "bcryptjs";
-import { userSchema } from "../services/schema.js";
-import { findUserByEmail, createUser } from "../repositories/userRepository.js";
+import { registerUser } from "../services/authService.js";
 
-const signup = async (req, res) => {
+const renderSignupForm = (res, { values = {}, fieldErrors = {} } = {}) =>
+  res.render("auth/signup", { layout: false, values, fieldErrors });
+
+const getSignupForm = (_req, res) => renderSignupForm(res);
+
+const signup = async (req, res, next) => {
   try {
-    // Validate request body
-    const result = userSchema.safeParse(req.body);
-
-    if (!result.success) {
-      return res.status(400).json(result.error.flatten(issue => issue.message));
-    }
-
-    const { username, email, password } = result.data;
-
-    // Check if user already exists
-    const existingUser = await findUserByEmail(email);
-
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already exists" });
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
-    await createUser({
-      data: {
-        username,
-        email,
-        password: hashedPassword,
-        profile: {
-          create: {
-            bio: "",
-            location: "",
-            pronoun: "",
-            image: ""
-          }
-        }
-      },
-      include: {
-        profile: true
-      }
-    });
-
+    await registerUser(req.body);
     res.redirect("/login");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error creating user");
+  } catch (err) {
+    // Rejected input: show the form again with the errors, keeping what the user typed (except the password)
+    if (err.statusCode === 400) {
+      const { username = "", email = "" } = req.body;
+      res.status(400);
+      return renderSignupForm(res, { values: { username, email }, fieldErrors: err.fieldErrors });
+    }
+    next(err);
   }
 };
 
 export default {
+  getSignupForm,
   signup
 };
