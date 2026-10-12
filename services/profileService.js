@@ -1,14 +1,13 @@
 import { findProfileById, findProfileByUserId, findProfiles, updateProfile } from '../repositories/profileRepository.js';
 import { findFollowRequests } from '../repositories/followRequestRepository.js';
+import { httpError } from './httpError.js';
+
+const MAX_LENGTHS = { bio: 300, location: 100, pronoun: 30 };
 
 // Get a profile by its ID (with optional includes)
 export const getProfileById = async (id, args = {}) => {
   const profile = await findProfileById(id, args);
-  if (!profile) {
-    const err = new Error('Profile not found');
-    err.statusCode = 404;
-    throw err;
-  }
+  if (!profile) throw httpError(404, 'Profile not found');
   return profile;
 };
 
@@ -33,11 +32,7 @@ export const getProfileWithPosts = async (id, currentUserId) => {
       },
     },
   });
-  if (!profile) {
-    const err = new Error('Profile not found');
-    err.statusCode = 404;
-    throw err;
-  }
+  if (!profile) throw httpError(404, 'Profile not found');
   profile.user.posts.forEach(post => {
     post.isLiked = post.likes.length > 0;
   });
@@ -79,16 +74,27 @@ export const getAllProfiles = async (searchTerm) => {
 
 // Update a profile — enforces ownership
 export const editProfile = async (id, currentUserId, { bio, location, pronoun, filename }) => {
-  const profile = await findProfileById(id);
-  if (!profile) throw new Error('Profile not found');
-  if (profile.userId !== currentUserId) throw new Error('Not your profile');
+  const profile = await getOwnProfile(id, currentUserId);
+
+  const fields = { bio, location, pronoun };
+  for (const [name, value] of Object.entries(fields)) {
+    fields[name] = typeof value === 'string' ? value.trim() : '';
+    if (fields[name].length > MAX_LENGTHS[name]) {
+      throw httpError(400, `${name[0].toUpperCase() + name.slice(1)} can be at most ${MAX_LENGTHS[name]} characters`);
+    }
+  }
 
   return updateProfile(id, {
-    bio,
-    location,
-    pronoun,
+    ...fields,
     image: filename ?? profile.image,
   });
+};
+
+// Get a profile only if it belongs to the current user (for the edit form)
+export const getOwnProfile = async (id, currentUserId, args = {}) => {
+  const profile = await getProfileById(id, args);
+  if (profile.userId !== currentUserId) throw httpError(403, 'Not your profile');
+  return profile;
 };
 
 // Get profile by userId (used for redirect and global middleware)

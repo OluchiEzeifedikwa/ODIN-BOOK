@@ -1,5 +1,5 @@
 import {
-  getProfileById,
+  getOwnProfile,
   getProfileWithPosts,
   getFollowedProfiles,
   getAllProfiles,
@@ -7,17 +7,16 @@ import {
 } from '../services/profileService.js';
 import minutesAgo from '../services/minutesAgo.js';
 
-// Render the editProfile form
-const getEditProfileForm = async (req, res) => {
-  if (!req.user) return res.redirect('/login');
+// Render the editProfile form — only for your own profile
+const getEditProfileForm = async (req, res, next) => {
   try {
-    const profile = await getProfileById(req.params.id, { include: { user: true } });
+    const profile = await getOwnProfile(req.params.id, req.user.id, {
+      include: { user: { select: { username: true } } },
+    });
 
     res.render('pages/editProfile', { profile, query: req.query });
-  } catch (error) {
-    console.error(error);
-    if (error.statusCode === 404) return res.status(404).send('Profile not found');
-    res.status(500).send('Error fetching profile');
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -54,20 +53,17 @@ const getProfilesHandler = async (req, res) => {
 
 // Get profile by ID
 const getProfileByIdHandler = async (req, res, next) => {
-  if (!req.user) return res.redirect('/login');
   try {
     const profile = await getProfileWithPosts(req.params.id, req.user.id);
 
     res.render('pages/profileDetail', { profile, minutesAgo });
   } catch (err) {
-    console.error(err);
     next(err);
   }
 };
 
 // Update the profile
-const updateProfileHandler = async (req, res) => {
-  if (!req.user) return res.redirect('/login');
+const updateProfileHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { bio, location, pronoun } = req.body;
@@ -81,9 +77,15 @@ const updateProfileHandler = async (req, res) => {
 
     res.redirect(`/profiles/${id}`);
   } catch (err) {
-    console.error('[updateProfile] error:', err.message);
-    res.redirect(`/editProfile/${req.params.id}?error=${encodeURIComponent(err.message)}`);
+    next(err);
   }
+};
+
+// Rejected profile edit or image (400): back to the edit form with the message
+// eslint-disable-next-line no-unused-vars
+const updateProfileError = (err, req, res, next) => {
+  if (err.statusCode !== 400) return next(err);
+  res.redirect(`/editProfile/${req.params.id}?error=${encodeURIComponent(err.message)}`);
 };
 
 // Default export
@@ -93,4 +95,5 @@ export default {
   getProfiles: getProfilesHandler,
   getProfileById: getProfileByIdHandler,
   updateProfile: updateProfileHandler,
+  updateProfileError,
 };

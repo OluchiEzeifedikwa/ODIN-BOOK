@@ -1,16 +1,19 @@
 import { findLike, createLike, deleteManyLikes, countLikes } from '../repositories/likeRepository.js';
 import { findPostById } from '../repositories/postRepository.js';
 import { createNotification } from './notificationService.js';
+import { httpError } from './httpError.js';
 
 // Like a post — guards against duplicate likes and notifies post owner
 export const likePost = async (postId, userId) => {
+  const post = await findPostById(postId, { select: { userId: true } });
+  if (!post) throw httpError(404, 'Post not found');
+
   const existingLike = await findLike(postId, userId);
-  if (existingLike) throw new Error('You have already liked this post');
+  if (existingLike) throw httpError(400, 'You have already liked this post');
 
   const like = await createLike({ postId, userId });
 
-  const post = await findPostById(postId, { select: { userId: true } });
-  if (post && post.userId !== userId) {
+  if (post.userId !== userId) {
     try {
       await createNotification({ userId: post.userId, type: 'like', likeId: like.id });
     } catch (e) {
@@ -28,7 +31,7 @@ export const unlikePost = async (postId, userId) => {
     where: { AND: [{ postId }, { userId }] },
   });
 
-  if (deleted.count === 0) throw new Error("You haven't liked this post");
+  if (deleted.count === 0) throw httpError(400, "You haven't liked this post");
 
   const likeCount = await countLikes(postId);
   return { likes: likeCount };
